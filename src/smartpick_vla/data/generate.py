@@ -108,7 +108,7 @@ def generate_expert_dataset(
     for buffer in episode_buffers:
         for key in records:
             records[key].extend(buffer[key])
-    arrays = {
+    arrays: dict[str, np.ndarray] = {
         "rgb": np.asarray(records["rgb"], dtype=np.uint8),
         "robot_state": np.asarray(records["robot_state"], dtype=np.float32),
         "action": np.asarray(records["action"], dtype=np.float32),

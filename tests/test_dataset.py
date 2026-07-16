@@ -3,9 +3,12 @@
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from smartpick_vla.data.dataset import TrajectoryDataset, load_trajectory_npz
 from smartpick_vla.data.generate import GenerationConfig, generate_expert_dataset
+
+pytestmark = pytest.mark.mujoco
 
 
 def test_generated_dataset_retains_attempt_accounting_and_chunks(tmp_path: Path) -> None:

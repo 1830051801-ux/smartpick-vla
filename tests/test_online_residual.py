@@ -3,12 +3,16 @@
 from dataclasses import asdict
 from pathlib import Path
 
+import pytest
+
 from smartpick_vla.envs import SmartPickEnv
 from smartpick_vla.envs.randomization import DomainRandomizationConfig
 from smartpick_vla.evaluation.residual_controller import ResidualPolicyController
 from smartpick_vla.models import CompactVLAConfig, CompactVLAPolicy
 from smartpick_vla.training.checkpoint import save_checkpoint
 from smartpick_vla.training.online_residual import ResidualOnlineConfig, train_residual_online
+
+pytestmark = pytest.mark.mujoco
 
 
 def test_tiny_online_residual_training_and_controller(tmp_path: Path) -> None:

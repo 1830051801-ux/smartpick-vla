@@ -53,8 +53,9 @@ Before a tag, also follow [docs/RELEASE.md](docs/RELEASE.md) and run the strict
 gate with the intended version, for example
 `python scripts/check_release.py --strict --tag v0.1.0`.
 
-MuJoCo rendering on Linux CI uses a software/off-screen backend. Windows tests
-should avoid multi-process rendering unless a change specifically validates it.
+MuJoCo rendering on Linux CI uses a software/off-screen backend. GitHub's
+Windows runners execute the platform-safe suite because they do not expose a
+working OpenGL context; use a Windows machine with OpenGL for renderer changes.
 
 ## Code expectations
 

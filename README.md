@@ -112,9 +112,10 @@ MUJOCO_GL=egl .venv/bin/python -m smartpick_vla demo-expert \
   --output results/quickstart/expert.gif
 ```
 
-MuJoCo Linux CI installs Mesa and uses a headless backend. Windows rendering is
-validated with the native MuJoCo/GLFW wheel. Paths are handled with `pathlib`;
-the recorded run also validates a Windows profile containing non-ASCII text.
+MuJoCo Linux CI installs Mesa and runs the rendering tests headlessly. GitHub's
+Windows runners have no usable OpenGL context, so they run the platform-safe
+suite; the recorded local Windows run covers native MuJoCo/GLFW rendering.
+Paths are handled with `pathlib`, including Windows profiles with non-ASCII text.
 
 PyTorch wheels contain very deep third-party license paths. If `pip` raises
 `WinError 206` in a deeply nested checkout, create the virtual environment at a
@@ -329,8 +330,8 @@ tests/                            unit and MuJoCo integration tests
 ```
 
 CI covers Windows and Ubuntu across Python 3.11, 3.12, and 3.13. Full training
-stays out of CI; CI runs environment/render, model update, checkpoint, real-log,
-safety, and benchmark-runner smoke tests. See
+stays out of CI. Linux runs the rendering tests; Windows covers models,
+checkpoints, logs, safety, metrics, and the benchmark runner. See
 [`docs/RELEASE.md`](docs/RELEASE.md).
 
 ## Known limitations

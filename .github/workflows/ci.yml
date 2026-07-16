@@ -43,10 +43,10 @@ jobs:
       PYTHONUTF8: "1"
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -66,8 +66,13 @@ jobs:
       - name: Check release structure
         run: python scripts/check_release.py
 
-      - name: Run fast tests
+      - name: Run tests with MuJoCo rendering
+        if: runner.os != 'Windows'
         run: python -m pytest -m "not slow"
+
+      - name: Run platform-safe tests
+        if: runner.os == 'Windows'
+        run: python -m pytest -m "not slow and not mujoco"
 
   quality:
     name: Static checks and package build
@@ -79,10 +84,10 @@ jobs:
       PYTHONUTF8: "1"
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: pip

@@ -27,6 +27,8 @@ intends to use semantic versioning after its first tagged release.
   tag-triggered draft-release workflow with clean-wheel verification.
 - Bandit source scanning and installed-dependency vulnerability auditing in CI
   and tag-triggered release checks.
+- CI separates headless Linux rendering tests from the Windows platform-safe
+  suite because GitHub-hosted Windows runners do not provide an OpenGL context.
 - Reproducibility and release guides covering provenance, seed/artifact
   contracts, resource-conscious local runs, claim audits, and rollback policy.
 - Source distributions include the committed smoke checkpoints and complete
