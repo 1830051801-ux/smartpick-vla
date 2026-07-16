@@ -1,0 +1,37 @@
+{
+  "episode_id": "ood-seed-9100",
+  "experiment_tier": "smoke",
+  "fps": 25.0,
+  "frame_count": 91,
+  "gif_file": "ood-seed-9100.gif",
+  "media_type": "qualitative_episode_gif",
+  "method": "compact_vla",
+  "randomization": {
+    "camera_fovy_delta_deg": 0.0,
+    "camera_offset_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "control_delay_steps": 0,
+    "detection_noise_std_m": 0.0,
+    "enabled": false,
+    "friction_scale": 1.0,
+    "light_scale": 1.0,
+    "mass_scales": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "robot_state_noise_std": 0.0
+  },
+  "reset_options": {
+    "instruction_split": "train",
+    "ood_layout": true
+  },
+  "schema_version": "1.0",
+  "seed": 9100,
+  "success": false,
+  "suite": "ood",
+  "task_class": "scratch"
+}

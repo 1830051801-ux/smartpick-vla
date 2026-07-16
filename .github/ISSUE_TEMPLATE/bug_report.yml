@@ -1,0 +1,77 @@
+name: Bug report
+description: Report a reproducible simulator, model, data, or tooling defect.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Do not attach private robot logs, credentials, facility images, or
+        untrusted checkpoints. Use a private security report for safety or
+        security issues that should not be disclosed publicly.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - MuJoCo / Gymnasium environment
+        - Demonstration data or schema
+        - BC / Compact VLA
+        - Residual SAC
+        - Evaluation or artifacts
+        - Real-log replay
+        - ROS 2 dry-run
+        - Packaging / documentation
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Version or revision
+      description: Release tag or commit SHA; include whether the worktree was modified.
+      placeholder: v0.1.0 or 0123456789abcdef
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python, PyTorch, MuJoCo, CUDA/driver, device, and renderer backend.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Exact command, resolved config, seed, and smallest input needed.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+      description: Include the full traceback or failing assertion as text.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Non-sensitive artifacts
+      description: Paths or links to manifests, metrics, logs, or screenshots after redaction.
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope confirmation
+      options:
+        - label: I removed credentials, private images, and proprietary robot data.
+          required: true
+        - label: I did not interpret simulation or dry-run output as real-robot evidence.
+          required: true

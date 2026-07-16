@@ -1,0 +1,61 @@
+{
+  "episode_id": "physics-seed-9100",
+  "experiment_tier": "smoke",
+  "fps": 25.0,
+  "frame_count": 91,
+  "gif_file": "physics-seed-9100.gif",
+  "media_type": "qualitative_episode_gif",
+  "method": "vla_dr_residual",
+  "randomization": {
+    "camera_fovy_delta_deg": 3.359532264695937,
+    "camera_offset_m": [
+      0.023514,
+      0.003612,
+      0.014173
+    ],
+    "config": {
+      "camera_fovy_delta_deg": 4.0,
+      "camera_position_std_m": 0.015,
+      "control_delay_steps": [
+        1,
+        3
+      ],
+      "detection_noise_std_m": 0.006,
+      "enabled": true,
+      "friction_scale": [
+        0.45,
+        1.7
+      ],
+      "light_intensity_scale": [
+        0.65,
+        1.35
+      ],
+      "object_color_jitter": 0.12,
+      "object_mass_scale": [
+        0.55,
+        1.55
+      ],
+      "robot_state_noise_std": 0.003
+    },
+    "control_delay_steps": 3,
+    "detection_noise_std_m": 0.006,
+    "enabled": true,
+    "friction_scale": 1.3250357930104963,
+    "light_scale": 0.8384816064104977,
+    "mass_scales": [
+      1.0677,
+      1.252831,
+      1.321878
+    ],
+    "robot_state_noise_std": 0.003
+  },
+  "reset_options": {
+    "instruction_split": "train",
+    "ood_layout": false
+  },
+  "schema_version": "1.0",
+  "seed": 9100,
+  "success": false,
+  "suite": "physics",
+  "task_class": "scratch"
+}

@@ -1,0 +1,404 @@
+{
+  "artifacts": [
+    {
+      "bytes": 8699,
+      "path": "src/smartpick_vla/envs/assets/smartpick_scene.xml",
+      "sha256": "63fb987a71af59e45c181d4e46698e61353d7ecdfc6a1f11eba45e9f9cee2ccd"
+    },
+    {
+      "bytes": 7137388,
+      "path": "datasets/generated/smoke/expert_nominal.npz",
+      "sha256": "401a04d346a5c4bab2b7a94829f1391b564a85386debee0b0e49b3f898f71abd"
+    },
+    {
+      "bytes": 55709,
+      "path": "datasets/generated/smoke/expert_nominal.manifest.json",
+      "sha256": "bc3c7fe64463176011e2ce79efae8aeb4659f6d12c87e810a0ddcf24269425f9"
+    },
+    {
+      "bytes": 7911714,
+      "path": "datasets/generated/smoke/expert_dr.npz",
+      "sha256": "53f32b811b0884f081ecb2706dbf4e48b38220e349e1c45d41f474a2efda15f0"
+    },
+    {
+      "bytes": 104942,
+      "path": "datasets/generated/smoke/expert_dr.manifest.json",
+      "sha256": "3dd6a80d1733160814b76e6a5f33ab12c276b3dd157d23b8aa04906763ecfca8"
+    },
+    {
+      "bytes": 1389715,
+      "path": "checkpoints/smoke/bc/best.pt",
+      "sha256": "fff9f52370928ea29b8f218eb209bf732baf1ea924f8a60201b30bc09c51163f"
+    },
+    {
+      "bytes": 1102,
+      "path": "checkpoints/smoke/bc/history.csv",
+      "sha256": "3dee579aef1fd5a698b1ea6ea2732dc140375d00785392d1322f2d5af8130da0"
+    },
+    {
+      "bytes": 4723,
+      "path": "checkpoints/smoke/bc/manifest.json",
+      "sha256": "401cf3e650ad7ae5392fb174d85555fd91de8cfdbf307629694749653126c475"
+    },
+    {
+      "bytes": 4920219,
+      "path": "checkpoints/smoke/vla/best.pt",
+      "sha256": "16936f7e2f203ad6934757946951b3e921c680c54ccbd471a2b4fcfff7dd4fc1"
+    },
+    {
+      "bytes": 1272,
+      "path": "checkpoints/smoke/vla/history.csv",
+      "sha256": "2a58e1057f34fa82cd1cf0fbca55b5f40dd4efd1f0e7dfd5f5559e56bf9e7ca8"
+    },
+    {
+      "bytes": 5528,
+      "path": "checkpoints/smoke/vla/manifest.json",
+      "sha256": "758c8e1f856be1d472c89ee3f32184810a84c746f487cecce5da90c86fc9ca3d"
+    },
+    {
+      "bytes": 4919963,
+      "path": "checkpoints/smoke/vla_dr/best.pt",
+      "sha256": "a2bd3e529b64ae54ca811e60bd7f65683b7a99f8b860c7a556987187843c2ea3"
+    },
+    {
+      "bytes": 764,
+      "path": "checkpoints/smoke/vla_dr/history.csv",
+      "sha256": "133d064fd74306fc956a36af97b9274606ab9800046133dc0b06ae35986499f4"
+    },
+    {
+      "bytes": 4260,
+      "path": "checkpoints/smoke/vla_dr/manifest.json",
+      "sha256": "2ab3abca74ed1736b2ae1113b1ba6e82b4f712ebefc66d5012bfe46d3f672e09"
+    },
+    {
+      "bytes": 985289,
+      "path": "checkpoints/smoke/residual/last.pt",
+      "sha256": "30cdc921644f55ef73a497c40b6bf7742db316fb878bb89f79a9df3169bdbb87"
+    },
+    {
+      "bytes": 230906,
+      "path": "checkpoints/smoke/residual/updates.csv",
+      "sha256": "48e0f481006d71c15907ed3efe139838cf1258545bb543f42d8b56810bfb6e47"
+    },
+    {
+      "bytes": 654,
+      "path": "checkpoints/smoke/residual/episodes.csv",
+      "sha256": "d6e81bca4624f65a8206b2c7a96482e8fa2883f3e6bc237c412e72d135801090"
+    },
+    {
+      "bytes": 2313,
+      "path": "checkpoints/smoke/residual/manifest.json",
+      "sha256": "dd8724860c5ef3cf310c3a17c906e182c3146a460b68556caee3ea2b00b533f2"
+    },
+    {
+      "bytes": 127763,
+      "path": "results/smoke/eval_episodes.csv",
+      "sha256": "202d923a1135615bc406145f14f761720bf88f065e4b2a8cb02e460a97786640"
+    },
+    {
+      "bytes": 26790,
+      "path": "results/smoke/summary.json",
+      "sha256": "4d187b1272c7971efd0d5a3a33ca7a83d770d5c11440e529cdbb6b9d45281382"
+    },
+    {
+      "bytes": 54323,
+      "path": "results/smoke/plots/evaluation_collision_rate.png",
+      "sha256": "a238f84c580aba5c82188390304ab31f328a5b7c8118c0886bdf8bdd4d234ba9"
+    },
+    {
+      "bytes": 54378,
+      "path": "results/smoke/plots/evaluation_success_rate.png",
+      "sha256": "2421185804b535da2d31397d8e86f566351a5d2b3a261b814e6edf6aef06dbac"
+    },
+    {
+      "bytes": 53375,
+      "path": "results/smoke/plots/evaluation_timeout_rate.png",
+      "sha256": "b801174649549063ff8d1a00ef8ec1939c3d3538ca18b6cf9db457960bfb55b0"
+    },
+    {
+      "bytes": 56105,
+      "path": "results/smoke/plots/learning_bc.png",
+      "sha256": "ab26ff78e3a0f66d8dd41879e94b79e2dec9b8b2b3ea523a0560fe03d737786d"
+    },
+    {
+      "bytes": 64786,
+      "path": "results/smoke/plots/learning_compact_vla.png",
+      "sha256": "f8205d87bc9298ba204cc0351df8408598adaad79debb93d20af999fb1ef153a"
+    },
+    {
+      "bytes": 121174,
+      "path": "results/smoke/plots/learning_residual_sac.png",
+      "sha256": "046f680ce8b934fd8a9fd5a46d0407a164c96363270fc298716d6c481b29a504"
+    },
+    {
+      "bytes": 71470,
+      "path": "results/smoke/plots/learning_vla_dr.png",
+      "sha256": "0e560acbe29ca1a5cf67b58fdab98c896d32d95e0d01e63f35924cd5d3a24108"
+    },
+    {
+      "bytes": 409973,
+      "path": "results/smoke/media/bc/id-seed-9100.gif",
+      "sha256": "3c3bb05fc3ba86b3db4233296db7d471a3b7c12a4c2a3a7fc84b19122474ee04"
+    },
+    {
+      "bytes": 411375,
+      "path": "results/smoke/media/bc/ood-seed-9100.gif",
+      "sha256": "916c4a9d188c1cc034cf733a03907631e10edea8df5c708d4d47be75c4293d07"
+    },
+    {
+      "bytes": 407864,
+      "path": "results/smoke/media/bc/paraphrase-seed-9100.gif",
+      "sha256": "f0b08bd60412ee8c3d42093b45affe6a1279415f32df80fa0249923d04c0d26e"
+    },
+    {
+      "bytes": 413309,
+      "path": "results/smoke/media/bc/physics-seed-9100.gif",
+      "sha256": "8d09e0002a0d552dedaea70229857b0e0f07f5e2b642b91c120ef49a2b06a85a"
+    },
+    {
+      "bytes": 409217,
+      "path": "results/smoke/media/compact_vla/id-seed-9100.gif",
+      "sha256": "3249810d00b07cbe398849184f5acbf9d47182f654d9d02c1762488993ca96a5"
+    },
+    {
+      "bytes": 407785,
+      "path": "results/smoke/media/compact_vla/ood-seed-9100.gif",
+      "sha256": "218688a3693b215ee89d9efbc8f4a61ba080300b5b1ff0efaf30bce39822d4ab"
+    },
+    {
+      "bytes": 410663,
+      "path": "results/smoke/media/compact_vla/paraphrase-seed-9100.gif",
+      "sha256": "55408b99bcbd9509d1dde059cced52a7b77eae9403b758d027bf7e15fecaffef"
+    },
+    {
+      "bytes": 299858,
+      "path": "results/smoke/media/compact_vla/physics-seed-9100.gif",
+      "sha256": "060c7206ba0718e22d728a52fb377d176144e1e9df226431b1b55bbf3d645eb6"
+    },
+    {
+      "bytes": 153809,
+      "path": "results/smoke/media/ik_expert/id-seed-9100.gif",
+      "sha256": "1d1beadf2d140903ed82306361dda2b8255db069be53c08f7df56ab589c76b63"
+    },
+    {
+      "bytes": 157654,
+      "path": "results/smoke/media/ik_expert/ood-seed-9100.gif",
+      "sha256": "8a9444cae71af8c47bdf38bd34e283e34a3867ea213723108fcf779b7e6c23ea"
+    },
+    {
+      "bytes": 153809,
+      "path": "results/smoke/media/ik_expert/paraphrase-seed-9100.gif",
+      "sha256": "1d1beadf2d140903ed82306361dda2b8255db069be53c08f7df56ab589c76b63"
+    },
+    {
+      "bytes": 190815,
+      "path": "results/smoke/media/ik_expert/physics-seed-9100.gif",
+      "sha256": "b944745cf1e9e1c10c9bc83a500660eee02b48036cd534afcc944b1944934096"
+    },
+    {
+      "bytes": 410237,
+      "path": "results/smoke/media/vla_dr/id-seed-9100.gif",
+      "sha256": "f1e877a4cfbf928f13c09a82d37671a03e2256c4a9707abb570bca05f6b31a40"
+    },
+    {
+      "bytes": 408801,
+      "path": "results/smoke/media/vla_dr/ood-seed-9100.gif",
+      "sha256": "8f9d1c1a614b5e84dc7cc2e9bb5fcd549315103f4991aa089c96621df0be671d"
+    },
+    {
+      "bytes": 411056,
+      "path": "results/smoke/media/vla_dr/paraphrase-seed-9100.gif",
+      "sha256": "3af7e131c8af80104db0385bcfed10124eaadae60d3762da003c2ee5647b2d0d"
+    },
+    {
+      "bytes": 412834,
+      "path": "results/smoke/media/vla_dr/physics-seed-9100.gif",
+      "sha256": "d5c99d10199f1e535be5eb93cd4c0454b7593ef5dcdbf0e1bcf771de776ab5f6"
+    },
+    {
+      "bytes": 405780,
+      "path": "results/smoke/media/vla_dr_residual/id-seed-9100.gif",
+      "sha256": "7b45160f13019364198d9c9b0a1b550e6c64ea4b18c8591d0cb50438f1f84463"
+    },
+    {
+      "bytes": 405626,
+      "path": "results/smoke/media/vla_dr_residual/ood-seed-9100.gif",
+      "sha256": "63fecf792b490bf80d0a9dc7383e4a28d6827a2d28c3c6bc670e593e228c32af"
+    },
+    {
+      "bytes": 408169,
+      "path": "results/smoke/media/vla_dr_residual/paraphrase-seed-9100.gif",
+      "sha256": "3d00cfd1e7215a85b1a42d86991da3c5cce6abd1f4ff685edac2f3140294af1a"
+    },
+    {
+      "bytes": 413152,
+      "path": "results/smoke/media/vla_dr_residual/physics-seed-9100.gif",
+      "sha256": "b0b03dc6b8b8dd0f596d1b0e3b2693b16143eb5315f382ded45bc0605d807cd4"
+    },
+    {
+      "bytes": 741,
+      "path": "results/smoke/media/bc/id-seed-9100.gif.json",
+      "sha256": "7c3387c76257be806dda5c6d21efb01a305152d979cee5b52bce87058c8a110b"
+    },
+    {
+      "bytes": 743,
+      "path": "results/smoke/media/bc/ood-seed-9100.gif.json",
+      "sha256": "0c6becb7525d9e1ea414ded1e978d314a6e4d108d8776365a3abf9f4298be8ad"
+    },
+    {
+      "bytes": 770,
+      "path": "results/smoke/media/bc/paraphrase-seed-9100.gif.json",
+      "sha256": "9cdcff2c9e210a7c8079d484983782dd96e789c674158c01cdc8050833bd0a2a"
+    },
+    {
+      "bytes": 1317,
+      "path": "results/smoke/media/bc/physics-seed-9100.gif.json",
+      "sha256": "52123f43004ab610d14f7e2a8d73872d6fd5e6619af63ca7e88dbf6b2ce88742"
+    },
+    {
+      "bytes": 750,
+      "path": "results/smoke/media/compact_vla/id-seed-9100.gif.json",
+      "sha256": "8f094a82dacff780a357d23e80d7916a869af4cb49279605a3dbb5e5824925c7"
+    },
+    {
+      "bytes": 752,
+      "path": "results/smoke/media/compact_vla/ood-seed-9100.gif.json",
+      "sha256": "3677b5ab7d5d6472b29b5d344a7e673a2bb7152f6788af2405c4a35445b5f991"
+    },
+    {
+      "bytes": 779,
+      "path": "results/smoke/media/compact_vla/paraphrase-seed-9100.gif.json",
+      "sha256": "ea45fe40b73f9bbd7ec5005737a1ba6ed1996006e3d52bfeb05be54f075ce196"
+    },
+    {
+      "bytes": 1325,
+      "path": "results/smoke/media/compact_vla/physics-seed-9100.gif.json",
+      "sha256": "01d050483f865d7da586bdabcbd8496bf40031f33574b219e89d872cc79f86d6"
+    },
+    {
+      "bytes": 747,
+      "path": "results/smoke/media/ik_expert/id-seed-9100.gif.json",
+      "sha256": "aecf8e3d40b8f7f72c4a8ac8157cd6a228fc627b1233e8ffcc6d1fd011cadfc9"
+    },
+    {
+      "bytes": 749,
+      "path": "results/smoke/media/ik_expert/ood-seed-9100.gif.json",
+      "sha256": "d1b7b56d07a697777fe6ff35aa3732d2e48cdc4fcbac922eb7a2b56e4562f0a1"
+    },
+    {
+      "bytes": 776,
+      "path": "results/smoke/media/ik_expert/paraphrase-seed-9100.gif.json",
+      "sha256": "74b2c1a215d6b8dffc7bca739dce047b3402961ee8cbbca3a8042cb7fbd752b7"
+    },
+    {
+      "bytes": 1323,
+      "path": "results/smoke/media/ik_expert/physics-seed-9100.gif.json",
+      "sha256": "12b7ac8d3bfa1480a38bf5af04356e61ca7e47f362e1a4659a30fcdf03f20801"
+    },
+    {
+      "bytes": 745,
+      "path": "results/smoke/media/vla_dr/id-seed-9100.gif.json",
+      "sha256": "42e1f588a26167e35f6afc57dce568ee2ac33f9ea6d6beaaf09ed1b737f68518"
+    },
+    {
+      "bytes": 747,
+      "path": "results/smoke/media/vla_dr/ood-seed-9100.gif.json",
+      "sha256": "c1ba9339022eb869e3f56cd8dc11372a2bc8fbc3c0ef10387cb9c490937b1d31"
+    },
+    {
+      "bytes": 774,
+      "path": "results/smoke/media/vla_dr/paraphrase-seed-9100.gif.json",
+      "sha256": "8b79d08e36df6c1d7ed09a1d75b063b8b7d1a61ffa24bf10924da8f288c52f95"
+    },
+    {
+      "bytes": 1321,
+      "path": "results/smoke/media/vla_dr/physics-seed-9100.gif.json",
+      "sha256": "1ba238ea399fc30cb0b2504709d66f3e4039e979e2b381cdcb7e834186065014"
+    },
+    {
+      "bytes": 754,
+      "path": "results/smoke/media/vla_dr_residual/id-seed-9100.gif.json",
+      "sha256": "3143325a244756f83c144182e04cf7943369619c071bec89674ca7e95d96be1e"
+    },
+    {
+      "bytes": 756,
+      "path": "results/smoke/media/vla_dr_residual/ood-seed-9100.gif.json",
+      "sha256": "68ebe5eb9f21255301dd0c2251713cffb9931786085b73fbe3b0cc9735986c9f"
+    },
+    {
+      "bytes": 783,
+      "path": "results/smoke/media/vla_dr_residual/paraphrase-seed-9100.gif.json",
+      "sha256": "214d16d769c37a7dad11ee3b9f9163a530092d6babbe948b6592a51691abb0ea"
+    },
+    {
+      "bytes": 1330,
+      "path": "results/smoke/media/vla_dr_residual/physics-seed-9100.gif.json",
+      "sha256": "90c436a513910418710d596db897dc79b597c81b76b73498af3f3b88228bad19"
+    }
+  ],
+  "claim_scope": "simulation pipeline verification; not statistical or physical-robot evidence",
+  "configs": [
+    {
+      "bytes": 204,
+      "path": "configs/train/data_smoke.yaml",
+      "sha256": "df6b591c6ec60ad4b375d2795c1944a203198d36c1b034985ea0519c91120619"
+    },
+    {
+      "bytes": 484,
+      "path": "configs/train/data_dr_smoke.yaml",
+      "sha256": "aa700898e78bc1935ab98d0f9f445e9c561b4d49f5aad2e78581473b1f9a8cc1"
+    },
+    {
+      "bytes": 397,
+      "path": "configs/train/bc_smoke.yaml",
+      "sha256": "3b73c754d6f3cdb790c00e0a0c8c0591e8329f77ab4fe115a95b3bb53b6c881d"
+    },
+    {
+      "bytes": 520,
+      "path": "configs/train/vla_smoke.yaml",
+      "sha256": "7be7b00c4f80b176fa5768b370e6620ac1e3bf9e976ed177fbfad7d2c320b44a"
+    },
+    {
+      "bytes": 519,
+      "path": "configs/train/vla_dr_smoke.yaml",
+      "sha256": "0d817f9f1f223d0aaa72d4277270897d07b28691bc879beb5add31feafa41bad"
+    },
+    {
+      "bytes": 687,
+      "path": "configs/train/residual_smoke.yaml",
+      "sha256": "c1394a9b169839906e523dccfb5a69ecded80fece2597d47c6fa32cd626ab93d"
+    },
+    {
+      "bytes": 468,
+      "path": "configs/eval/smoke.yaml",
+      "sha256": "f520bac635bc786ea69a2530e6b7b0c0fb9f71f83361a6a677ab1caa16d4d769"
+    }
+  ],
+  "created_at_utc": "2026-07-14T19:58:38.060972+00:00",
+  "experiment_tier": "smoke",
+  "git_commit": null,
+  "packages": {
+    "gymnasium": "1.3.0",
+    "imageio": "2.37.3",
+    "matplotlib": "3.11.0",
+    "mujoco": "3.10.0",
+    "numpy": "2.5.1",
+    "pandas": "3.0.3",
+    "pillow": "12.3.0",
+    "pyyaml": "6.0.3",
+    "torch": "2.13.0"
+  },
+  "physical_robot_success_rate_claimed": false,
+  "physical_robot_trials": 0,
+  "runtime": {
+    "cuda_available": false,
+    "cuda_runtime": null,
+    "gymnasium": "1.3.0",
+    "mujoco": "3.10.0",
+    "numpy": "2.5.1",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.14 (tags/v3.13.14:fd17997, Jun 10 2026, 13:03:48) [MSC v.1944 64 bit (AMD64)]",
+    "torch": "2.13.0+cpu"
+  },
+  "schema_version": "smartpick-smoke-run/v1"
+}

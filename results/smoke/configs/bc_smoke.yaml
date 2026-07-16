@@ -1,0 +1,22 @@
+training:
+  policy: bc
+  epochs: 12
+  batch_size: 128
+  learning_rate: 0.0005
+  weight_decay: 0.00001
+  validation_fraction: 0.20
+  seed: 1701
+  device: auto
+  num_workers: 0
+  gradient_clip_norm: 1.0
+  loss_kind: smooth_l1
+model:
+  robot_state_dim: 24
+  action_dim: 5
+  d_model: 64
+  hidden_dim: 128
+  language_max_length: 64
+  language_layers: 1
+  nhead: 4
+  dropout: 0.0
+  squash_actions: true

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>smartpick_vla_ros2</name>
+  <version>0.1.0</version>
+  <description>Typed ROS 2 dry-run and safety boundary for SmartPick-VLA action chunks.</description>
+  <maintainer email="296258327+1830051801-ux@users.noreply.github.com">1830051801-ux</maintainer>
+  <license>MIT</license>
+  <url type="repository">https://github.com/1830051801-ux/smartpick-vla</url>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+  <build_depend>rosidl_default_generators</build_depend>
+
+  <depend>builtin_interfaces</depend>
+  <depend>geometry_msgs</depend>
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

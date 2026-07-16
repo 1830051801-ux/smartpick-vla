@@ -1,0 +1,21 @@
+seed_start: 9100
+episodes_per_suite: 6
+max_episode_steps: 180
+image_size: 64
+replan_interval: 4
+suites:
+  - id
+  - paraphrase
+  - ood
+  - physics
+physics_randomization:
+  enabled: true
+  object_mass_scale: [0.55, 1.55]
+  friction_scale: [0.45, 1.70]
+  camera_position_std_m: 0.015
+  camera_fovy_delta_deg: 4.0
+  light_intensity_scale: [0.65, 1.35]
+  object_color_jitter: 0.12
+  robot_state_noise_std: 0.003
+  detection_noise_std_m: 0.006
+  control_delay_steps: [1, 3]

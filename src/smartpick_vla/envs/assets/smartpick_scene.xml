@@ -1,0 +1,138 @@
+<mujoco model="smartpick_sorting_cell">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast" cone="elliptic" iterations="50"/>
+  <size njmax="1200" nconmax="300"/>
+  <visual>
+    <global offwidth="192" offheight="192"/>
+    <quality shadowsize="2048"/>
+    <map znear="0.01" zfar="5"/>
+  </visual>
+
+  <default>
+    <geom condim="4" friction="0.9 0.02 0.002" solref="0.008 1" solimp="0.95 0.99 0.002"/>
+    <joint damping="1.2" armature="0.03"/>
+    <default class="arm">
+      <geom type="capsule" size="0.032" rgba="0.19 0.25 0.32 1" mass="0.7"/>
+    </default>
+    <default class="finger">
+      <joint type="slide" damping="0.8" armature="0.01" range="0 0.032"/>
+      <geom type="box" size="0.010 0.008 0.044" rgba="0.12 0.14 0.18 1" mass="0.06" friction="1.8 0.03 0.003"/>
+    </default>
+    <default class="object">
+      <geom type="box" size="0.031 0.031 0.024" mass="0.07" friction="1.1 0.02 0.002"/>
+    </default>
+  </default>
+
+  <asset>
+    <texture name="floor_tex" type="2d" builtin="checker" rgb1="0.09 0.11 0.13" rgb2="0.13 0.15 0.17" width="256" height="256"/>
+    <material name="floor_mat" texture="floor_tex" texrepeat="4 4" reflectance="0.05"/>
+    <material name="table_mat" rgba="0.55 0.58 0.61 1" reflectance="0.08"/>
+  </asset>
+
+  <worldbody>
+    <light name="key" pos="-0.4 -0.4 1.2" dir="0.3 0.2 -1" diffuse="0.85 0.85 0.85" castshadow="true"/>
+    <light name="fill" pos="0.6 0.2 0.8" dir="-0.4 -0.2 -1" diffuse="0.35 0.38 0.42"/>
+    <camera name="top" pos="0 -0.02 1.18" quat="1 0 0 0" fovy="40"/>
+    <camera name="oblique" pos="0.72 -0.82 0.78" xyaxes="0.75 0.66 0 -0.34 0.39 0.86" fovy="48"/>
+
+    <geom name="floor" type="plane" size="2 2 0.1" pos="0 0 -0.055" material="floor_mat"/>
+    <geom name="table" type="box" size="0.48 0.42 0.025" pos="0 0 -0.027" material="table_mat" friction="0.9 0.02 0.002"/>
+
+    <!-- Three semantic destination trays: accepted, scratch, and unknown. -->
+    <body name="accepted_bin" pos="-0.22 0.16 0.006">
+      <geom name="accepted_bin_bottom" type="box" size="0.092 0.072 0.006" rgba="0.25 0.28 0.31 1"/>
+      <geom name="accepted_bin_back" type="box" pos="0 0.072 0.025" size="0.092 0.006 0.025" rgba="0.16 0.18 0.21 1"/>
+      <geom name="accepted_bin_left" type="box" pos="-0.092 0 0.025" size="0.006 0.072 0.025" rgba="0.16 0.18 0.21 1"/>
+      <geom name="accepted_bin_right" type="box" pos="0.092 0 0.025" size="0.006 0.072 0.025" rgba="0.16 0.18 0.21 1"/>
+      <geom name="accepted_bin_label" type="box" pos="0 0.066 0.054" size="0.030 0.008 0.007" rgba="0.20 0.72 0.32 1" contype="0" conaffinity="0"/>
+      <site name="accepted_bin_site" pos="0 0 0.055" size="0.004" rgba="0 1 0 0"/>
+    </body>
+    <body name="scratch_bin" pos="0 0.16 0.006">
+      <geom name="scratch_bin_bottom" type="box" size="0.092 0.072 0.006" rgba="0.25 0.28 0.31 1"/>
+      <geom name="scratch_bin_back" type="box" pos="0 0.072 0.025" size="0.092 0.006 0.025" rgba="0.16 0.18 0.21 1"/>
+      <geom name="scratch_bin_left" type="box" pos="-0.092 0 0.025" size="0.006 0.072 0.025" rgba="0.16 0.18 0.21 1"/>
+      <geom name="scratch_bin_right" type="box" pos="0.092 0 0.025" size="0.006 0.072 0.025" rgba="0.16 0.18 0.21 1"/>
+      <geom name="scratch_bin_label" type="box" pos="0 0.066 0.054" size="0.030 0.008 0.007" rgba="0.95 0.48 0.08 1" contype="0" conaffinity="0"/>
+      <site name="scratch_bin_site" pos="0 0 0.055" size="0.004" rgba="1 0.4 0 0"/>
+    </body>
+    <body name="unknown_bin" pos="0.22 0.16 0.006">
+      <geom name="unknown_bin_bottom" type="box" size="0.092 0.072 0.006" rgba="0.25 0.28 0.31 1"/>
+      <geom name="unknown_bin_back" type="box" pos="0 0.072 0.025" size="0.092 0.006 0.025" rgba="0.16 0.18 0.21 1"/>
+      <geom name="unknown_bin_left" type="box" pos="-0.092 0 0.025" size="0.006 0.072 0.025" rgba="0.16 0.18 0.21 1"/>
+      <geom name="unknown_bin_right" type="box" pos="0.092 0 0.025" size="0.006 0.072 0.025" rgba="0.16 0.18 0.21 1"/>
+      <geom name="unknown_bin_label" type="box" pos="0 0.066 0.054" size="0.030 0.008 0.007" rgba="0.55 0.35 0.90 1" contype="0" conaffinity="0"/>
+      <site name="unknown_bin_site" pos="0 0 0.055" size="0.004" rgba="0.5 0 1 0"/>
+    </body>
+
+    <!-- Primitive-only five-axis arm. The policy commands Cartesian xyz/yaw deltas. -->
+    <body name="robot_base" pos="0 -0.20 0.0">
+      <geom name="base_geom" type="cylinder" size="0.075 0.055" pos="0 0 0.055" rgba="0.10 0.13 0.17 1" mass="2.5" contype="0" conaffinity="0"/>
+      <body name="shoulder_yaw" pos="0 0 0.105">
+        <joint name="joint_base_yaw" type="hinge" axis="0 0 1" range="-2.75 2.75"/>
+        <geom name="shoulder_geom" type="cylinder" size="0.052 0.055" rgba="0.17 0.22 0.29 1" mass="1.0" contype="0" conaffinity="0"/>
+        <body name="upper_arm" pos="0 0 0.045">
+          <joint name="joint_shoulder" type="hinge" axis="1 0 0" range="-2.15 1.15"/>
+          <geom name="upper_arm_geom" class="arm" fromto="0 0 0 0 0 0.245"/>
+          <body name="forearm" pos="0 0 0.245">
+            <joint name="joint_elbow" type="hinge" axis="1 0 0" range="-2.55 2.35"/>
+            <geom name="elbow_geom" type="sphere" size="0.045" rgba="0.12 0.17 0.23 1" mass="0.35"/>
+            <geom name="forearm_geom" class="arm" fromto="0 0 0 0 0 0.225"/>
+            <body name="wrist_pitch" pos="0 0 0.225">
+              <joint name="joint_wrist_pitch" type="hinge" axis="1 0 0" range="-2.75 2.75"/>
+              <geom name="wrist_link_geom" class="arm" size="0.027" fromto="0 0 0 0 0 0.105" mass="0.35"/>
+              <body name="hand" pos="0 0 0.105">
+                <joint name="joint_wrist_yaw" type="hinge" axis="0 0 1" range="-3.0 3.0" damping="0.5"/>
+                <geom name="palm_geom" type="box" size="0.044 0.052 0.022" rgba="0.10 0.13 0.17 1" mass="0.25"/>
+                <site name="grip_site" pos="0 0 0.065" size="0.008" rgba="0.1 0.8 1 0.35"/>
+                <body name="left_finger" pos="0 0.012 0.055">
+                  <joint name="left_finger_joint" class="finger" axis="0 1 0"/>
+                  <geom name="left_finger_geom" class="finger" pos="0 0 0.025"/>
+                </body>
+                <body name="right_finger" pos="0 -0.012 0.055">
+                  <joint name="right_finger_joint" class="finger" axis="0 -1 0"/>
+                  <geom name="right_finger_geom" class="finger" pos="0 0 0.025"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <body name="obj0" pos="-0.16 -0.06 0.026">
+      <freejoint name="obj0_free"/>
+      <geom name="obj0_geom" class="object" rgba="0.2 0.7 0.3 1"/>
+      <geom name="obj0_mark" type="box" pos="0 0 0.023" size="0.019 0.004 0.002" rgba="0.05 0.08 0.10 1" mass="0.001"/>
+    </body>
+    <body name="obj1" pos="0 -0.01 0.026">
+      <freejoint name="obj1_free"/>
+      <geom name="obj1_geom" class="object" rgba="0.9 0.45 0.1 1"/>
+      <geom name="obj1_mark" type="box" pos="0 0 0.023" size="0.019 0.004 0.002" rgba="0.05 0.08 0.10 1" mass="0.001"/>
+    </body>
+    <body name="obj2" pos="0.16 -0.06 0.026">
+      <freejoint name="obj2_free"/>
+      <geom name="obj2_geom" class="object" rgba="0.45 0.3 0.75 1"/>
+      <geom name="obj2_mark" type="box" pos="0 0 0.023" size="0.008 0.008 0.002" rgba="0.95 0.95 0.95 1" mass="0.001"/>
+    </body>
+  </worldbody>
+
+  <equality>
+    <weld name="grasp_obj0" body1="hand" body2="obj0" relpose="0 0 0.078 1 0 0 0" active="false" solref="0.004 1"/>
+    <weld name="grasp_obj1" body1="hand" body2="obj1" relpose="0 0 0.078 1 0 0 0" active="false" solref="0.004 1"/>
+    <weld name="grasp_obj2" body1="hand" body2="obj2" relpose="0 0 0.078 1 0 0 0" active="false" solref="0.004 1"/>
+  </equality>
+
+  <actuator>
+    <position name="base_yaw_act" joint="joint_base_yaw" kp="180" kv="18" ctrlrange="-2.75 2.75"/>
+    <position name="shoulder_act" joint="joint_shoulder" kp="220" kv="22" ctrlrange="-2.15 1.15"/>
+    <position name="elbow_act" joint="joint_elbow" kp="180" kv="18" ctrlrange="-2.55 2.35"/>
+    <position name="wrist_pitch_act" joint="joint_wrist_pitch" kp="100" kv="10" ctrlrange="-2.75 2.75"/>
+    <position name="wrist_yaw_act" joint="joint_wrist_yaw" kp="70" kv="7" ctrlrange="-3 3"/>
+    <position name="left_finger_act" joint="left_finger_joint" kp="90" kv="5" ctrlrange="0 0.032"/>
+    <position name="right_finger_act" joint="right_finger_joint" kp="90" kv="5" ctrlrange="0 0.032"/>
+  </actuator>
+
+  <keyframe>
+    <key name="home" qpos="0 0.20 -2.00 -1.00 0 0.028 0.028 -0.16 -0.06 0.026 1 0 0 0 0 -0.01 0.026 1 0 0 0 0.16 -0.06 0.026 1 0 0 0" ctrl="0 0.20 -2.00 -1.00 0 0.028 0.028"/>
+  </keyframe>
+</mujoco>

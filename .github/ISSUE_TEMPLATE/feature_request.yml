@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose a scoped change to the research platform.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What reproducible research or integration problem is not currently addressed?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe interfaces, configuration, and compatibility impact.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Validation plan
+      description: Name the deterministic tests and experiment artifacts that would validate it.
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety and real-system impact
+      description: Explain any action-schema, ROS, hardware, log privacy, or claims impact.
+    validations:
+      required: true
+  - type: checkboxes
+    id: compatibility
+    attributes:
+      label: Compatibility
+      options:
+        - label: I identified any schema, checkpoint, dataset, or action-contract migration required.
+          required: true

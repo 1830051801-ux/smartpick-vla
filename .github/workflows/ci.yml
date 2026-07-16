@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python-version: "3.11"
+            mujoco-gl: egl
+          - os: ubuntu-latest
+            python-version: "3.12"
+            mujoco-gl: egl
+          - os: ubuntu-latest
+            python-version: "3.13"
+            mujoco-gl: egl
+          - os: windows-latest
+            python-version: "3.11"
+            mujoco-gl: wgl
+          - os: windows-latest
+            python-version: "3.13"
+            mujoco-gl: wgl
+    env:
+      MUJOCO_GL: ${{ matrix.mujoco-gl }}
+      PYTHONHASHSEED: "0"
+      PYTHONUTF8: "1"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install Linux rendering libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libegl1 libgl1 libglfw3 libosmesa6
+
+      - name: Install package and development tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.7,<3"
+          python -m pip install -e ".[dev]"
+
+      - name: Check release structure
+        run: python scripts/check_release.py
+
+      - name: Run fast tests
+        run: python -m pytest -m "not slow"
+
+  quality:
+    name: Static checks and package build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      MUJOCO_GL: egl
+      PYTHONHASHSEED: "0"
+      PYTHONUTF8: "1"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install Linux rendering libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libegl1 libgl1 libglfw3 libosmesa6
+
+      - name: Install package and development tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.7,<3"
+          python -m pip install -e ".[dev]"
+
+      - name: Ruff lint
+        run: python -m ruff check .
+
+      - name: Ruff format
+        run: python -m ruff format --check .
+
+      - name: Mypy
+        run: python -m mypy src/smartpick_vla
+
+      - name: Bandit medium/high-confidence scan
+        run: python -m bandit -r src scripts ros2_ws -q -ll -ii
+
+      - name: Audit installed dependencies
+        run: python -m pip_audit --local --skip-editable
+
+      - name: Build distributions
+        run: python -m build
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-distributions
+          path: dist/*
+          if-no-files-found: error

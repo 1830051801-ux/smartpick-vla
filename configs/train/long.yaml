@@ -1,0 +1,13 @@
+# This configuration is supplied for longer local experiments and has not been
+# run as part of the repository's committed smoke benchmark.
+data_episodes: 900
+image_size: 96
+bc_epochs: 30
+vla_epochs: 40
+batch_size: 32
+residual_environment_steps: 80000
+residual_warmup_steps: 5000
+evaluation_episodes_per_suite: 100
+seeds: [1701, 1702, 1703]
+device: cuda
+num_workers: 0

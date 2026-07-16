@@ -1,0 +1,70 @@
+name: Experiment report
+description: Submit a reproducible result, failed run, or protocol question.
+title: "[Experiment]: "
+labels: [experiment]
+body:
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Experiment tier
+      options:
+        - Smoke
+        - Local benchmark
+        - Long training
+        - Real-log replay
+        - Real robot
+    validations:
+      required: true
+  - type: dropdown
+    id: method
+    attributes:
+      label: Method
+      options:
+        - IK expert
+        - Behavior cloning
+        - Compact VLA
+        - Compact VLA + domain randomization
+        - Compact VLA + domain randomization + residual SAC
+        - Other protocol-compatible method
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Exact command and revision
+      description: Include the source revision, resolved config path, and all overrides.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence artifacts
+      description: Link manifest.json, eval_episodes.csv, summary.json, and checkpoint hashes.
+    validations:
+      required: true
+  - type: textarea
+    id: conditions
+    attributes:
+      label: Conditions
+      description: Seeds, hardware, episode counts, suites, grasp assist, DR, and training budget.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome and failures
+      description: Summarize measured outcomes; include failed or aborted runs that affect selection.
+    validations:
+      required: true
+  - type: checkboxes
+    id: claims
+    attributes:
+      label: Claims confirmation
+      options:
+        - label: Metrics are generated from the linked episode-level artifacts.
+          required: true
+        - label: Smoke results are labeled as pipeline checks, not benchmarks.
+          required: true
+        - label: Real-log replay and ROS 2 dry-run are not described as real-robot success.
+          required: true

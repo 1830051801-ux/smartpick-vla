@@ -1,0 +1,22 @@
+# Long evaluation budget; not represented as already executed results.
+seed_start: 19100
+episodes_per_suite: 100
+max_episode_steps: 200
+image_size: 96
+replan_interval: 4
+suites:
+  - id
+  - paraphrase
+  - ood
+  - physics
+physics_randomization:
+  enabled: true
+  object_mass_scale: [0.50, 1.70]
+  friction_scale: [0.40, 1.80]
+  camera_position_std_m: 0.018
+  camera_fovy_delta_deg: 5.0
+  light_intensity_scale: [0.60, 1.40]
+  object_color_jitter: 0.15
+  robot_state_noise_std: 0.004
+  detection_noise_std_m: 0.008
+  control_delay_steps: [1, 3]

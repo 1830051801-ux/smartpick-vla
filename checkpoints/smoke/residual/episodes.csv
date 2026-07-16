@@ -1,0 +1,11 @@
+episode,seed,environment_step,steps,return,success,collision_steps,wrong_pick,wrong_bin
+0,3701,180,180,-39.138132870197296,False,22,False,False
+1,3702,360,180,-39.984512627124786,False,9,False,False
+2,3703,540,180,-18.185294955968857,False,0,False,False
+3,3704,720,180,-28.42836555838585,False,8,False,False
+4,3705,900,180,-211.54745119810104,False,91,True,False
+5,3706,1080,180,-52.75520150363445,False,33,False,False
+6,3707,1260,180,-21.43241299688816,False,0,False,False
+7,3708,1440,180,-26.392255313694477,False,21,False,False
+8,3709,1620,180,-46.82663491368294,False,34,False,False
+9,3710,1800,180,-8.540287259966135,False,59,False,False

@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: >-
+  If you use SmartPick-VLA in research, cite the software version and the exact
+  experiment artifacts used in your work.
+title: SmartPick-VLA
+type: software
+authors:
+  - given-names: SmartPick-VLA
+    family-names: Contributors
+version: 0.1.0
+date-released: 2026-07-16
+license: MIT
+repository-code: https://github.com/1830051801-ux/smartpick-vla
+abstract: >-
+  A compact research platform for language-conditioned MuJoCo manipulation,
+  action-chunk imitation learning, bounded residual reinforcement learning, and
+  Real2Sim2Real preparation with a ROS 2 dry-run boundary.
+keywords:
+  - robotics
+  - vision-language-action
+  - imitation learning
+  - residual reinforcement learning
+  - MuJoCo
+  - sim-to-real

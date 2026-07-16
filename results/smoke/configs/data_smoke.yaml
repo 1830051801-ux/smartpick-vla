@@ -1,0 +1,10 @@
+generation:
+  episodes: 72
+  seed: 1701
+  image_size: 64
+  max_episode_steps: 180
+  domain_randomization: false
+  noisy_expert_detection: false
+  grasp_assist: true
+domain_randomization:
+  enabled: false

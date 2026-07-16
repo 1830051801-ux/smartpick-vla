@@ -1,0 +1,83 @@
+# SmartPick-VLA real-robot preparation profile.
+# This is a conservative dry-run profile, not a hardware safety certification.
+schema_version: "1.0"
+
+action:
+  dim: 5
+  order: [dx_m, dy_m, dz_m, dyaw_rad, gripper]
+  frame_id: base_link
+  translation_unit: m
+  rotation_unit: rad
+  gripper_range: [-1.0, 1.0]
+  default_horizon: 8
+  default_dt_s: 0.05
+
+safety:
+  required_frame: base_link
+  workspace_min_m: [-0.70, -0.45, 0.04]
+  workspace_max_m: [0.75, 0.45, 0.65]
+  min_radius_m: 0.10
+  max_radius_m: 0.75
+  max_translation_step_m: 0.02
+  max_yaw_step_rad: 0.08
+  gripper_min: -1.0
+  gripper_max: 1.0
+  min_dt_s: 0.01
+  max_dt_s: 0.20
+  max_horizon: 16
+  max_command_age_s: 0.50
+  max_state_age_s: 0.25
+  future_tolerance_s: 0.05
+  residual_max_abs: [0.004, 0.004, 0.004, 0.02, 0.15]
+  # Populate these from the actual robot URDF before hardware enablement.
+  joint_lower_rad: []
+  joint_upper_rad: []
+
+execution:
+  # Both values must be changed explicitly before hardware publication is possible.
+  dry_run: true
+  hardware_enabled: false
+  max_heartbeat_age_s: 0.25
+  future_tolerance_s: 0.05
+  audit_jsonl: results/real/dry_run_actions.jsonl
+
+replay:
+  sample_period_s: 0.05
+  speed: 1.0
+
+camera:
+  image_topic: /smartpick/camera/image_raw
+  camera_info_topic: /smartpick/camera/camera_info
+  expected_width: 128
+  expected_height: 128
+  color_order: rgb
+
+robot:
+  state_topic: /smartpick/robot_state
+  controller_heartbeat_topic: /smartpick/controller_heartbeat
+  command_topic: /smartpick/safe_action_chunk
+  control_delay_s: 0.04
+  watchdog_timeout_s: 0.25
+  joint_names: []
+
+system_parameters:
+  # Replace nominal values with identified cell measurements before sim tuning.
+  object_mass_kg: 0.07
+  object_friction: 1.10
+  table_friction: 0.90
+  joint_damping_scale: 1.0
+  actuator_gain_scale: 1.0
+  control_delay_s: 0.04
+  detection_noise_std_m: 0.004
+  camera_position_std_m: 0.012
+
+calibration:
+  # Identity is a placeholder only. Keep calibrated=false until measured points are fitted.
+  calibrated: false
+  source_frame: camera_link
+  target_frame: base_link
+  rotation:
+    - [1.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0]
+    - [0.0, 0.0, 1.0]
+  translation_m: [0.0, 0.0, 0.0]

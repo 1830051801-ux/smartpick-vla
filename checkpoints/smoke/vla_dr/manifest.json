@@ -1,0 +1,200 @@
+{
+  "best_epoch": 8,
+  "best_validation_loss": 0.018118888291005556,
+  "checkpoints": {
+    "best": {
+      "path": "best.pt",
+      "sha256": "a2bd3e529b64ae54ca811e60bd7f65683b7a99f8b860c7a556987187843c2ea3"
+    },
+    "last": {
+      "path": "last.pt",
+      "sha256": "a2bd3e529b64ae54ca811e60bd7f65683b7a99f8b860c7a556987187843c2ea3"
+    }
+  },
+  "dataset": {
+    "path": "datasets\\generated\\smoke\\expert_dr.npz",
+    "sha256": "53f32b811b0884f081ecb2706dbf4e48b38220e349e1c45d41f474a2efda15f0"
+  },
+  "device": "cpu",
+  "global_steps": 392,
+  "history": [
+    {
+      "elapsed_s": 47.2235754000003,
+      "epoch": 1,
+      "global_step": 49,
+      "mean_gradient_norm": 0.13807191137148409,
+      "train_loss": 0.022518597467213262,
+      "validation_loss": 0.02365773376361065
+    },
+    {
+      "elapsed_s": 41.93734350000068,
+      "epoch": 2,
+      "global_step": 98,
+      "mean_gradient_norm": 0.14448161590464262,
+      "train_loss": 0.020872037249560257,
+      "validation_loss": 0.02178970521060646
+    },
+    {
+      "elapsed_s": 43.05310989999998,
+      "epoch": 3,
+      "global_step": 147,
+      "mean_gradient_norm": 0.14847240414546461,
+      "train_loss": 0.019627037154016445,
+      "validation_loss": 0.02121038476789966
+    },
+    {
+      "elapsed_s": 45.074832199999946,
+      "epoch": 4,
+      "global_step": 196,
+      "mean_gradient_norm": 0.1375101640516398,
+      "train_loss": 0.01863234161342285,
+      "validation_loss": 0.02135796490394827
+    },
+    {
+      "elapsed_s": 39.922077700000045,
+      "epoch": 5,
+      "global_step": 245,
+      "mean_gradient_norm": 0.15237515146026806,
+      "train_loss": 0.01785807182290116,
+      "validation_loss": 0.019796827666196726
+    },
+    {
+      "elapsed_s": 41.812339000000065,
+      "epoch": 6,
+      "global_step": 294,
+      "mean_gradient_norm": 0.16615073200391264,
+      "train_loss": 0.017085595303500185,
+      "validation_loss": 0.02014450591795033
+    },
+    {
+      "elapsed_s": 45.136733899999854,
+      "epoch": 7,
+      "global_step": 343,
+      "mean_gradient_norm": 0.18806259759834834,
+      "train_loss": 0.01671087985136071,
+      "validation_loss": 0.019429219016795837
+    },
+    {
+      "elapsed_s": 43.231688800000484,
+      "epoch": 8,
+      "global_step": 392,
+      "mean_gradient_norm": 0.17750060315034827,
+      "train_loss": 0.015895484642562817,
+      "validation_loss": 0.018118888291005556
+    }
+  ],
+  "initial_checkpoint": {
+    "path": "checkpoints\\smoke\\vla\\best.pt",
+    "sha256": "1ff02983d30990a08e2129892af1d660134a34551884f09c6b87ad53a7e6264d"
+  },
+  "model_config": {
+    "action_dim": 5,
+    "action_horizon": 8,
+    "d_model": 96,
+    "decoder_layers": 2,
+    "dropout": 0.0,
+    "feedforward_dim": 192,
+    "freeze_language": false,
+    "freeze_vision": false,
+    "language_layers": 1,
+    "language_max_length": 64,
+    "nhead": 4,
+    "robot_state_dim": 24,
+    "squash_actions": true,
+    "vision_grid_size": 5
+  },
+  "policy_kind": "compact_vla",
+  "schema_version": "smartpick-training/v1",
+  "torch_version": "2.13.0+cpu",
+  "total_parameters": 401429,
+  "trainable_parameters": 401429,
+  "training_config": {
+    "batch_size": 96,
+    "device": "auto",
+    "epochs": 8,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0002,
+    "loss_kind": "smooth_l1",
+    "num_workers": 0,
+    "policy": "compact_vla",
+    "seed": 2701,
+    "validation_fraction": 0.2,
+    "weight_decay": 1e-05
+  },
+  "training_episodes": [
+    5,
+    3,
+    66,
+    32,
+    31,
+    53,
+    43,
+    46,
+    55,
+    45,
+    39,
+    1,
+    58,
+    19,
+    30,
+    20,
+    17,
+    2,
+    54,
+    48,
+    42,
+    56,
+    44,
+    37,
+    28,
+    21,
+    50,
+    18,
+    41,
+    16,
+    8,
+    27,
+    15,
+    61,
+    69,
+    64,
+    29,
+    36,
+    70,
+    10,
+    49,
+    71,
+    25,
+    13,
+    63,
+    23,
+    11,
+    14,
+    7,
+    52,
+    0,
+    12,
+    34,
+    47,
+    65,
+    59,
+    40,
+    24
+  ],
+  "validation_episodes": [
+    68,
+    35,
+    38,
+    26,
+    6,
+    62,
+    22,
+    33,
+    60,
+    4,
+    67,
+    9,
+    51,
+    57
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "best_epoch": 12,
+  "best_validation_loss": 0.01959072962821087,
+  "checkpoints": {
+    "best": {
+      "path": "best.pt",
+      "sha256": "fff9f52370928ea29b8f218eb209bf732baf1ea924f8a60201b30bc09c51163f"
+    },
+    "last": {
+      "path": "last.pt",
+      "sha256": "fff9f52370928ea29b8f218eb209bf732baf1ea924f8a60201b30bc09c51163f"
+    }
+  },
+  "device": "cpu",
+  "global_steps": 432,
+  "history": [
+    {
+      "elapsed_s": 6.905525000000125,
+      "epoch": 1,
+      "global_step": 36,
+      "mean_gradient_norm": 0.17018823263545832,
+      "train_loss": 0.1460170845190684,
+      "validation_loss": 0.07528242033636459
+    },
+    {
+      "elapsed_s": 5.553884599999947,
+      "epoch": 2,
+      "global_step": 72,
+      "mean_gradient_norm": 0.11858913385205799,
+      "train_loss": 0.04256474076666766,
+      "validation_loss": 0.030639750921280583
+    },
+    {
+      "elapsed_s": 4.81905740000002,
+      "epoch": 3,
+      "global_step": 108,
+      "mean_gradient_norm": 0.12922722039123377,
+      "train_loss": 0.026743033331715398,
+      "validation_loss": 0.024898680160257303
+    },
+    {
+      "elapsed_s": 7.208304599999792,
+      "epoch": 4,
+      "global_step": 144,
+      "mean_gradient_norm": 0.10602223666177855,
+      "train_loss": 0.023069479088816378,
+      "validation_loss": 0.02270050196795263
+    },
+    {
+      "elapsed_s": 9.211321099999623,
+      "epoch": 5,
+      "global_step": 180,
+      "mean_gradient_norm": 0.11708349206795295,
+      "train_loss": 0.021816548141133454,
+      "validation_loss": 0.022283000481602186
+    },
+    {
+      "elapsed_s": 6.528426799999579,
+      "epoch": 6,
+      "global_step": 216,
+      "mean_gradient_norm": 0.10738765903645092,
+      "train_loss": 0.021480418741703033,
+      "validation_loss": 0.02151607746066891
+    },
+    {
+      "elapsed_s": 5.803329399999711,
+      "epoch": 7,
+      "global_step": 252,
+      "mean_gradient_norm": 0.10782921262499359,
+      "train_loss": 0.020706843222594924,
+      "validation_loss": 0.020918582616565384
+    },
+    {
+      "elapsed_s": 5.657098900000165,
+      "epoch": 8,
+      "global_step": 288,
+      "mean_gradient_norm": 0.0775754254621764,
+      "train_loss": 0.020273823704984453,
+      "validation_loss": 0.02108025505233591
+    },
+    {
+      "elapsed_s": 5.77938450000056,
+      "epoch": 9,
+      "global_step": 324,
+      "mean_gradient_norm": 0.12884387891325685,
+      "train_loss": 0.019994617918402784,
+      "validation_loss": 0.02075080896301247
+    },
+    {
+      "elapsed_s": 9.48633510000036,
+      "epoch": 10,
+      "global_step": 360,
+      "mean_gradient_norm": 0.10342457983642817,
+      "train_loss": 0.019853314695258934,
+      "validation_loss": 0.02014632088558696
+    },
+    {
+      "elapsed_s": 5.407235100000435,
+      "epoch": 11,
+      "global_step": 396,
+      "mean_gradient_norm": 0.10039734726564752,
+      "train_loss": 0.01948627870943811,
+      "validation_loss": 0.02045349263559992
+    },
+    {
+      "elapsed_s": 4.602520800000093,
+      "epoch": 12,
+      "global_step": 432,
+      "mean_gradient_norm": 0.1139284884557128,
+      "train_loss": 0.01942835163532032,
+      "validation_loss": 0.01959072962821087
+    }
+  ],
+  "model_config": {
+    "action_dim": 5,
+    "d_model": 64,
+    "dropout": 0.0,
+    "hidden_dim": 128,
+    "language_layers": 1,
+    "language_max_length": 64,
+    "nhead": 4,
+    "robot_state_dim": 24,
+    "squash_actions": true
+  },
+  "policy_kind": "bc",
+  "schema_version": "smartpick-training/v1",
+  "torch_version": "2.13.0+cpu",
+  "total_parameters": 111013,
+  "trainable_parameters": 111013,
+  "training_config": {
+    "batch_size": 128,
+    "device": "auto",
+    "epochs": 12,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0005,
+    "loss_kind": "smooth_l1",
+    "num_workers": 0,
+    "policy": "bc",
+    "seed": 1701,
+    "validation_fraction": 0.2,
+    "weight_decay": 1e-05
+  },
+  "training_episodes": [
+    63,
+    47,
+    8,
+    30,
+    48,
+    52,
+    61,
+    68,
+    62,
+    21,
+    50,
+    51,
+    49,
+    2,
+    67,
+    7,
+    45,
+    12,
+    69,
+    19,
+    31,
+    11,
+    15,
+    60,
+    40,
+    42,
+    0,
+    53,
+    39,
+    70,
+    34,
+    57,
+    66,
+    58,
+    46,
+    56,
+    28,
+    18,
+    22,
+    3,
+    20,
+    1,
+    13,
+    59,
+    71,
+    26,
+    9,
+    32,
+    14,
+    10,
+    27,
+    65,
+    33,
+    17,
+    55,
+    24,
+    16,
+    64
+  ],
+  "validation_episodes": [
+    4,
+    6,
+    54,
+    36,
+    25,
+    43,
+    37,
+    44,
+    23,
+    41,
+    38,
+    5,
+    35,
+    29
+  ]
+}
