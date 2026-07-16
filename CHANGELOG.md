@@ -44,6 +44,6 @@ intends to use semantic versioning after its first tagged release.
 
 ### Notes
 
-- No real-robot performance is claimed for this unreleased version.
+- No real-robot performance is claimed for this release.
 - Smoke experiments are pipeline validation only and must remain labeled as
   such in generated results.
