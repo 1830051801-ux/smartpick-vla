@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-SmartPick-VLA is pre-1.0 research software. Security fixes are applied to the
+PickSort-VLA is pre-1.0 research software. Security fixes are applied to the
 latest default branch and, after a tagged release exists, the most recent
 minor-release line when maintainers can reproduce the issue. Older snapshots
 and locally modified robot adapters are unsupported.
@@ -32,7 +32,7 @@ guaranteed for this volunteer research project.
 
 ### Checkpoints and serialized data
 
-SmartPick-VLA v2 checkpoints store tensors and primitive metadata and are loaded
+PickSort-VLA v2 checkpoints store tensors and primitive metadata and are loaded
 with PyTorch's restricted `weights_only=True` mode. Legacy or malformed files
 that require unrestricted pickle loading are rejected. Still verify published
 checksums and treat checkpoint, dataset, archive, and generated-media inputs as

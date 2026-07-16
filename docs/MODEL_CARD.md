@@ -2,7 +2,7 @@
 
 ## Model family
 
-SmartPick-VLA defines three learned policy families:
+PickSort-VLA defines three learned policy families:
 
 | Variant | Output | Role |
 | --- | --- | --- |

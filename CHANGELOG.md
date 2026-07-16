@@ -1,10 +1,22 @@
 # Changelog
 
-All notable changes to SmartPick-VLA are documented here. The project follows
+All notable changes to PickSort-VLA are documented here. The project follows
 the structure of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 intends to use semantic versioning after its first tagged release.
 
 ## [Unreleased]
+
+## [0.1.1] - 2026-07-17
+
+### Changed
+
+- Renamed the public project and GitHub repository from SmartPick-VLA to
+  PickSort-VLA to make the grasp-and-sort scope explicit.
+- Added `picksort` as the primary command while retaining `smartpick` as a
+  compatibility alias.
+- Kept the `smartpick-vla` distribution, `smartpick_vla` Python import,
+  `smartpick_vla_ros2` package, ROS topic names, checkpoint schemas, and Gym
+  environment ID stable so existing scripts and artifacts continue to work.
 
 ## [0.1.0] - 2026-07-16
 

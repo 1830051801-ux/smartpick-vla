@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This protocol defines the minimum evidence required to compare SmartPick-VLA
+This protocol defines the minimum evidence required to compare PickSort-VLA
 methods. It prevents smoke checks, privileged experts, cherry-picked videos,
 and unverified real-world claims from being mixed into one result table.
 

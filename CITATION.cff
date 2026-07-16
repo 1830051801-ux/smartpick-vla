@@ -1,16 +1,16 @@
 cff-version: 1.2.0
 message: >-
-  If you use SmartPick-VLA in research, cite the software version and the exact
+  If you use PickSort-VLA in research, cite the software version and the exact
   experiment artifacts used in your work.
-title: SmartPick-VLA
+title: PickSort-VLA
 type: software
 authors:
-  - given-names: SmartPick-VLA
+  - given-names: PickSort-VLA
     family-names: Contributors
-version: 0.1.0
-date-released: 2026-07-16
+version: 0.1.1
+date-released: 2026-07-17
 license: MIT
-repository-code: https://github.com/1830051801-ux/smartpick-vla
+repository-code: https://github.com/1830051801-ux/picksort-vla
 abstract: >-
   A compact research platform for language-conditioned MuJoCo manipulation,
   action-chunk imitation learning, bounded residual reinforcement learning, and

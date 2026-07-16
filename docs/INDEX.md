@@ -1,6 +1,6 @@
-# SmartPick-VLA documentation
+# PickSort-VLA documentation
 
-SmartPick-VLA is a research platform for language-conditioned tabletop sorting in
+PickSort-VLA is a research platform for language-conditioned tabletop sorting in
 MuJoCo. It combines a compact vision-language-action policy, an
 IK-based demonstration expert, domain randomization, and bounded residual
 reinforcement learning. The project is designed to run on a laptop-class GPU; it

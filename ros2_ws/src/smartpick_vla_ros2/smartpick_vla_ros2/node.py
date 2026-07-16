@@ -170,7 +170,7 @@ class SmartPickSafetyBridge(Node):
         )
 
         self.get_logger().info(
-            "SmartPick safety bridge started: "
+            "PickSort safety bridge started: "
             f"dry_run={gate_config.dry_run}, hardware_enabled={gate_config.hardware_enabled}"
         )
 

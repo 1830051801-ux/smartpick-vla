@@ -1,4 +1,4 @@
-# Canonical SmartPick-VLA action: base_link metres, radians, normalized gripper.
+# Canonical PickSort-VLA action: base_link metres, radians, normalized gripper.
 float32 dx_m
 float32 dy_m
 float32 dz_m

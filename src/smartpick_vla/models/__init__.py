@@ -1,4 +1,4 @@
-"""Trainable policies for SmartPick-VLA."""
+"""Trainable policies for PickSort-VLA."""
 
 from smartpick_vla.models.bc import BehaviorCloningConfig, BehaviorCloningPolicy
 from smartpick_vla.models.compact_vla import CompactVLAConfig, CompactVLAPolicy

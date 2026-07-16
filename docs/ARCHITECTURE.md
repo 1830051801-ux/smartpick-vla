@@ -2,7 +2,7 @@
 
 ## Scope and design constraints
 
-SmartPick-VLA studies a narrow but complete manipulation loop: observe a
+PickSort-VLA studies a narrow but complete manipulation loop: observe a
 tabletop sorting cell, interpret a natural-language quality instruction, and
 produce continuous robot actions. It intentionally targets a Windows laptop
 with an RTX 3050-class 4 GB GPU and 16 GB RAM.

@@ -1,6 +1,6 @@
-# Contributing to SmartPick-VLA
+# Contributing to PickSort-VLA
 
-Keep SmartPick-VLA small, inspectable, and reproducible. Claims must stay tied
+Keep PickSort-VLA small, inspectable, and reproducible. Claims must stay tied
 to committed evidence.
 
 ## Before opening a change

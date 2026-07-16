@@ -1,4 +1,4 @@
-# SmartPick-VLA real-robot preparation profile.
+# PickSort-VLA real-robot preparation profile.
 # This is a conservative dry-run profile, not a hardware safety certification.
 schema_version: "1.0"
 

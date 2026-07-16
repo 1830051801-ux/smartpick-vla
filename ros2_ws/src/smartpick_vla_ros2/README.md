@@ -1,4 +1,4 @@
-# SmartPick-VLA ROS 2 safety bridge
+# PickSort-VLA ROS 2 safety bridge
 
 This package converts typed action chunks into a dry-run preview and, only
 after all interlocks pass, a hardware command topic. It does not claim to be a
@@ -14,8 +14,8 @@ The ROS environment must also be able to import the `smartpick-vla` Python
 package from this repository. Build and run from a ROS 2 shell:
 
 ```bash
-python3 -m pip install -e /path/to/smartpick-vla
-cd /path/to/smartpick-vla/ros2_ws
+python3 -m pip install -e /path/to/picksort-vla
+cd /path/to/picksort-vla/ros2_ws
 colcon build --symlink-install
 source install/setup.bash
 ros2 launch smartpick_vla_ros2 safety_bridge.launch.py

@@ -79,6 +79,7 @@ jobs:
           wheel-test/bin/python -m pip install --upgrade pip "setuptools>=83"
           wheel-test/bin/python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.7,<3"
           wheel-test/bin/python -m pip install dist/*.whl
+          wheel-test/bin/picksort --help
           wheel-test/bin/smartpick --help
 
       - name: Generate distribution checksums

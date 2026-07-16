@@ -1,10 +1,10 @@
-# SmartPick-VLA
+# PickSort-VLA
 
-[![CI](https://github.com/1830051801-ux/smartpick-vla/actions/workflows/ci.yml/badge.svg)](https://github.com/1830051801-ux/smartpick-vla/actions/workflows/ci.yml)
+[![CI](https://github.com/1830051801-ux/picksort-vla/actions/workflows/ci.yml/badge.svg)](https://github.com/1830051801-ux/picksort-vla/actions/workflows/ci.yml)
 [![Python 3.11-3.13](https://img.shields.io/badge/python-3.11--3.13-3776AB)](https://www.python.org/)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-SmartPick-VLA is a compact MuJoCo/Gymnasium project for language-conditioned
+PickSort-VLA is a compact MuJoCo/Gymnasium project for language-conditioned
 quality sorting. An RGB-guided five-axis arm sorts `accepted`, `scratch`, and
 `unknown` parts from natural-language instructions. The repository includes an
 IK demonstration expert, behavior cloning, ACT-style action chunks, domain
@@ -13,6 +13,11 @@ randomization, bounded residual SAC, real-log replay, and a ROS 2 dry-run bridge
 > This is a **401k-parameter compact VLA**, not a 7B-scale foundation model.
 > The committed benchmark is simulation-only. No physical-robot success rate
 > is claimed.
+
+The public project name and repository are now **PickSort-VLA**. For v0.x
+compatibility, the Python distribution remains `smartpick-vla`, the import is
+`smartpick_vla`, and existing ROS/checkpoint identifiers are unchanged. New
+installs provide both `picksort` (preferred) and `smartpick` commands.
 
 ![IK expert demonstration](results/smoke/media/ik_expert/id-seed-9100.gif)
 

@@ -106,7 +106,7 @@ def load_checkpoint_payload(
         payload = torch.load(source, map_location=map_location, weights_only=True)
     except pickle.UnpicklingError as error:
         raise ValueError(
-            "checkpoint cannot be loaded safely; SmartPick-VLA requires a v2 "
+            "checkpoint cannot be loaded safely; PickSort-VLA requires a v2 "
             "weights-only checkpoint from a trusted release"
         ) from error
     if not isinstance(payload, dict) or payload.get("checkpoint_version") != CHECKPOINT_VERSION:

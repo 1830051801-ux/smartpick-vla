@@ -2,7 +2,7 @@
 
 ## Dataset purpose
 
-SmartPick-VLA data supports language-conditioned tabletop sorting, imitation
+PickSort-VLA data supports language-conditioned tabletop sorting, imitation
 learning, action-chunk prediction, simulation evaluation, and real-log replay.
 It is not a dataset for industrial defect inspection and does not establish the
 accuracy of accepted/scratch/unknown labels on real manufactured parts.

@@ -4,12 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "smartpick-vla"
-version = "0.1.0"
+version = "0.1.1"
 description = "Language-conditioned manipulation with compact action-chunk VLA policies, bounded residual RL, and Real2Sim2Real tooling."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 license = { file = "LICENSE" }
-authors = [{ name = "SmartPick-VLA contributors" }]
+authors = [{ name = "PickSort-VLA contributors" }]
 keywords = ["robotics", "mujoco", "vision-language-action", "reinforcement-learning", "sim2real"]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -34,10 +34,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/1830051801-ux/smartpick-vla"
-Documentation = "https://github.com/1830051801-ux/smartpick-vla/tree/main/docs"
-Issues = "https://github.com/1830051801-ux/smartpick-vla/issues"
-Source = "https://github.com/1830051801-ux/smartpick-vla"
+Homepage = "https://github.com/1830051801-ux/picksort-vla"
+Documentation = "https://github.com/1830051801-ux/picksort-vla/tree/main/docs"
+Issues = "https://github.com/1830051801-ux/picksort-vla/issues"
+Source = "https://github.com/1830051801-ux/picksort-vla"
 
 [project.optional-dependencies]
 dev = [
@@ -54,6 +54,7 @@ dev = [
 ros2 = []
 
 [project.scripts]
+picksort = "smartpick_vla.cli:main"
 smartpick = "smartpick_vla.cli:main"
 
 [tool.hatch.build.targets.wheel]

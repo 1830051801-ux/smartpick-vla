@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>smartpick_vla_ros2</name>
-  <version>0.1.0</version>
-  <description>Typed ROS 2 dry-run and safety boundary for SmartPick-VLA action chunks.</description>
+  <version>0.1.1</version>
+  <description>Typed ROS 2 dry-run and safety boundary for PickSort-VLA action chunks.</description>
   <maintainer email="296258327+1830051801-ux@users.noreply.github.com">1830051801-ux</maintainer>
   <license>MIT</license>
-  <url type="repository">https://github.com/1830051801-ux/smartpick-vla</url>
+  <url type="repository">https://github.com/1830051801-ux/picksort-vla</url>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>

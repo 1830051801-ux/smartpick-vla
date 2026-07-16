@@ -38,6 +38,11 @@ def _json_print(payload: Any) -> None:
     print(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False))
 
 
+def _program_name() -> str:
+    invoked_as = Path(sys.argv[0]).stem.lower()
+    return invoked_as if invoked_as in {"picksort", "smartpick"} else "picksort"
+
+
 def _command_doctor(args: argparse.Namespace) -> int:
     report: dict[str, Any] = {
         "smartpick_vla": __version__,
@@ -328,8 +333,8 @@ def _command_report(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="smartpick",
-        description="SmartPick-VLA simulation, training, and Real2Sim2Real tools",
+        prog=_program_name(),
+        description="PickSort-VLA simulation, training, and Real2Sim2Real tools",
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)

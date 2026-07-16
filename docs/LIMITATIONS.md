@@ -1,6 +1,6 @@
 # Limitations
 
-SmartPick-VLA is a small research platform. Its clean package structure and
+PickSort-VLA is a small research platform. Its clean package structure and
 end-to-end scripts do not make it a production manipulation system.
 
 ## Simulation fidelity

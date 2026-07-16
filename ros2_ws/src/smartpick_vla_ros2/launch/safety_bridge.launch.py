@@ -1,4 +1,4 @@
-"""Launch the SmartPick-VLA bridge in dry-run mode unless explicitly overridden."""
+"""Launch the PickSort-VLA bridge in dry-run mode unless explicitly overridden."""
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument

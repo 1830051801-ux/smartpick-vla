@@ -2,7 +2,7 @@
 
 ## Release invariants
 
-A SmartPick-VLA release is a traceable source and Python-package snapshot. A
+A PickSort-VLA release is a traceable source and Python-package snapshot. A
 tag is not enough. Before a release candidate can become public:
 
 - package, citation, ROS package, tag, and changelog versions agree;
@@ -103,7 +103,8 @@ fresh environment and install the wheel itself:
 python -m venv wheel-test
 wheel-test/bin/python -m pip install --upgrade pip
 wheel-test/bin/python -m pip install dist/smartpick_vla-*.whl
-wheel-test/bin/smartpick --help
+wheel-test/bin/picksort --help
+wheel-test/bin/smartpick --help  # compatibility alias
 ```
 
 PowerShell equivalent:
@@ -113,7 +114,8 @@ py -3.11 -m venv wheel-test
 .\wheel-test\Scripts\python -m pip install --upgrade pip
 $wheel = Get-ChildItem dist\smartpick_vla-*.whl | Select-Object -First 1
 .\wheel-test\Scripts\python -m pip install $wheel.FullName
-.\wheel-test\Scripts\smartpick.exe --help
+.\wheel-test\Scripts\picksort.exe --help
+.\wheel-test\Scripts\smartpick.exe --help  # compatibility alias
 ```
 
 Inspect the source distribution and wheel to confirm required package assets
@@ -125,7 +127,7 @@ absolute workstation paths are absent.
 Use an annotated tag after all intended release changes are committed:
 
 ```bash
-git tag -a vX.Y.Z -m "SmartPick-VLA vX.Y.Z"
+git tag -a vX.Y.Z -m "PickSort-VLA vX.Y.Z"
 git push origin vX.Y.Z
 ```
 
@@ -170,7 +172,8 @@ remediation.
 - [ ] Versions and changelog date agree.
 - [ ] Repository URLs and contacts are real and current.
 - [ ] CI matrix and strict release check pass.
-- [ ] Wheel installs in a clean environment and `smartpick --help` works.
+- [ ] Wheel installs in a clean environment and both `picksort --help` and the
+  compatibility alias `smartpick --help` work.
 - [ ] Result claims have raw JSON/CSV evidence and honest tier labels.
 - [ ] Real-log/dry-run work is not called real-robot success.
 - [ ] Data, checkpoint, asset, and FFmpeg obligations were reviewed.

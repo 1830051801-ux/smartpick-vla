@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import sys
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -28,6 +30,26 @@ def test_version_and_required_subcommand(capsys: pytest.CaptureFixture[str]) -> 
         main([])
     assert missing_exit.value.code == 2
     assert "required" in capsys.readouterr().err
+
+
+def test_primary_and_compatibility_console_scripts() -> None:
+    metadata = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    scripts = metadata["project"]["scripts"]
+    assert scripts["picksort"] == "smartpick_vla.cli:main"
+    assert scripts["smartpick"] == scripts["picksort"]
+
+
+@pytest.mark.parametrize("command", ["picksort", "smartpick"])
+def test_console_alias_reports_invoked_name(
+    command: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(sys, "argv", [f"{command}.exe"])
+    with pytest.raises(SystemExit) as version_exit:
+        main(["--version"])
+    assert version_exit.value.code == 0
+    assert capsys.readouterr().out.strip() == f"{command} {__version__}"
 
 
 def test_doctor_skip_environment_is_machine_readable(

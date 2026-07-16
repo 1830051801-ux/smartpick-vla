@@ -2,7 +2,7 @@
 
 ## What the name means in this project
 
-SmartPick-VLA uses **Real2Sim2Real** for an engineering workflow:
+PickSort-VLA uses **Real2Sim2Real** for an engineering workflow:
 
 1. ingest and validate logs from a real or external robot stack;
 2. replay compatible states/actions as a deterministic, optionally resampled

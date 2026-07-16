@@ -1,6 +1,6 @@
 # Third-party notices
 
-SmartPick-VLA source code is distributed under the MIT License. Third-party
+PickSort-VLA source code is distributed under the MIT License. Third-party
 software, models, assets, data, and media retain their own licenses. This file
 is an attribution aid, not legal advice; the installed lockfile/environment and
 the upstream projects are authoritative.
@@ -38,7 +38,7 @@ metadata.
 GitHub-hosted workflows use GitHub's checkout, Python setup, and artifact
 upload/download actions. Dependabot may propose dependency updates. These
 services and workflow actions are development infrastructure and are not
-incorporated into the SmartPick-VLA Python distribution. Their source and terms
+incorporated into the PickSort-VLA Python distribution. Their source and terms
 remain with their respective providers and repositories.
 
 ## FFmpeg
@@ -51,7 +51,7 @@ used where distributing an FFmpeg binary is undesirable.
 
 ## MuJoCo scene and assets
 
-The default SmartPick scene is constructed from repository-authored MJCF
+The default PickSort scene is constructed from repository-authored MJCF
 primitives and built-in MuJoCo texture generators. No MuJoCo Menagerie robot
 mesh is required by the default scene. Added robot descriptions, meshes,
 textures, fonts, sounds, or calibration targets must carry their own attribution

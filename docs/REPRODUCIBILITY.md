@@ -7,7 +7,7 @@
 
 ## Reproducibility target
 
-SmartPick-VLA targets repeatable experiment construction, not bit-for-bit
+PickSort-VLA targets repeatable experiment construction, not bit-for-bit
 identity across every GPU, driver, operating system, or MuJoCo renderer. A run
 is reproducible when another operator can recover its code, dependency set,
 resolved configuration, data split, seeds, checkpoint, episode-level metrics,
