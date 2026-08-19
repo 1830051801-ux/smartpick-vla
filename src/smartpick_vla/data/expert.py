@@ -32,10 +32,11 @@ class ExpertDiagnostics:
 class IKWaypointExpert:
     """Closed-loop Cartesian waypoint expert with privileged object poses.
 
-    The expert emits exactly the same normalized five-dimensional action as a
-    learned policy. It never receives hidden state through the observation; it
-    accesses environment poses explicitly and is therefore reported as a
-    privileged IK upper-bound, not as a deployable vision policy.
+    The expert emits the active environment's normalized action convention. It
+    leaves the optional sixth-axis roll delta at zero. It never receives hidden
+    state through the observation; it accesses environment poses explicitly and
+    is therefore reported as a privileged IK upper-bound, not as a deployable
+    vision policy.
     """
 
     def __init__(
@@ -52,24 +53,33 @@ class IKWaypointExpert:
         self.stage_step = 0
         self._object_xy = np.zeros(2, dtype=np.float64)
         self._bin_xy = np.zeros(2, dtype=np.float64)
+        self._task_signature: tuple[int, str] | None = None
 
     def reset(self) -> None:
+        self._reset_for_active_task()
+
+    def _reset_for_active_task(self) -> None:
         self.stage = "pregrasp"
         self.stage_step = 0
         self._object_xy = self.env.target_position(noisy=self.use_noisy_detection)[:2]
         self._bin_xy = self.env.bin_position(self.env.task.target_class)[:2]
+        self._task_signature = (self.env.mission_index, self.env.task.target_class)
 
     def act(self) -> tuple[np.ndarray, ExpertDiagnostics]:
+        if self._task_signature != (self.env.mission_index, self.env.task.target_class):
+            self._reset_for_active_task()
         if self.stage == "done":
-            return np.array([0.0, 0.0, 0.0, 0.0, 1.0], dtype=np.float32), self._diag(0.0)
+            action = np.zeros(self.env.action_dim, dtype=np.float32)
+            action[-1] = 1.0
+            return action, self._diag(0.0)
 
         gripper_position = self.env.gripper_position()
         target, gripper_command, minimum_steps = self._stage_target()
         error = target - gripper_position
         distance = float(np.linalg.norm(error))
-        action = np.zeros(5, dtype=np.float32)
+        action = np.zeros(self.env.action_dim, dtype=np.float32)
         action[:3] = np.clip(error / self.env.max_translation_m, -1.0, 1.0)
-        action[4] = gripper_command
+        action[-1] = gripper_command
         diagnostics = self._diag(distance)
 
         arrived = distance <= self.waypoint_tolerance_m

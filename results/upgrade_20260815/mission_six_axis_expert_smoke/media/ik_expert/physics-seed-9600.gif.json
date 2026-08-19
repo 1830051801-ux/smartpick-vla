@@ -1,0 +1,72 @@
+{
+  "episode_id": "physics-seed-9600",
+  "experiment_tier": "smoke",
+  "fps": 25.0,
+  "frame_count": 71,
+  "gif_file": "physics-seed-9600.gif",
+  "media_type": "qualitative_episode_gif",
+  "method": "ik_expert",
+  "randomization": {
+    "camera_fovy_delta_deg": -1.0978011178408562,
+    "camera_offset_m": [
+      -0.005539,
+      -0.002926,
+      -0.000971
+    ],
+    "config": {
+      "camera_fovy_delta_deg": 1.5,
+      "camera_position_std_m": 0.006,
+      "control_delay_steps": [
+        0,
+        1
+      ],
+      "detection_noise_std_m": 0.002,
+      "enabled": true,
+      "friction_scale": [
+        0.75,
+        1.25
+      ],
+      "image_noise_std_px": 0.0,
+      "image_occlusion_max_fraction": 0.0,
+      "image_occlusion_probability": 0.0,
+      "light_intensity_scale": [
+        0.8,
+        1.2
+      ],
+      "object_color_jitter": 0.06,
+      "object_mass_scale": [
+        0.75,
+        1.25
+      ],
+      "robot_state_noise_std": 0.001,
+      "vision_latency_frames": [
+        0,
+        0
+      ]
+    },
+    "control_delay_steps": 1,
+    "detection_noise_std_m": 0.002,
+    "enabled": true,
+    "friction_scale": 1.1476347115410979,
+    "image_noise_std_px": 0.0,
+    "image_occlusion_max_fraction": 0.0,
+    "image_occlusion_probability": 0.0,
+    "light_scale": 0.8370532722516344,
+    "mass_scales": [
+      1.090443,
+      1.077794,
+      0.930732
+    ],
+    "robot_state_noise_std": 0.001,
+    "vision_latency_frames": 0
+  },
+  "reset_options": {
+    "instruction_split": "train",
+    "ood_layout": false
+  },
+  "schema_version": "1.0",
+  "seed": 9600,
+  "success": true,
+  "suite": "physics",
+  "task_class": "accepted"
+}

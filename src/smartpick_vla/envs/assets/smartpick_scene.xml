@@ -83,14 +83,21 @@
               <body name="hand" pos="0 0 0.105">
                 <joint name="joint_wrist_yaw" type="hinge" axis="0 0 1" range="-3.0 3.0" damping="0.5"/>
                 <geom name="palm_geom" type="box" size="0.044 0.052 0.022" rgba="0.10 0.13 0.17 1" mass="0.25"/>
-                <site name="grip_site" pos="0 0 0.065" size="0.008" rgba="0.1 0.8 1 0.35"/>
-                <body name="left_finger" pos="0 0.012 0.055">
-                  <joint name="left_finger_joint" class="finger" axis="0 1 0"/>
-                  <geom name="left_finger_geom" class="finger" pos="0 0 0.025"/>
-                </body>
-                <body name="right_finger" pos="0 -0.012 0.055">
-                  <joint name="right_finger_joint" class="finger" axis="0 -1 0"/>
-                  <geom name="right_finger_geom" class="finger" pos="0 0 0.025"/>
+                <body name="wrist_roll" pos="0 0 0">
+                  <!-- Sixth axis is optional at the environment interface. Keeping the
+                       tool point on this axis preserves legacy five-axis trajectories. -->
+                  <joint name="joint_wrist_roll" type="hinge" axis="0 0 1" range="-3.0 3.0" damping="0.45"/>
+                  <geom name="wrist_roll_geom" type="cylinder" size="0.033 0.020" pos="0 0 0.024" rgba="0.16 0.21 0.27 1" mass="0.10"/>
+                  <site name="grip_site" pos="0 0 0.065" size="0.008" rgba="0.1 0.8 1 0.35"/>
+                  <camera name="wrist" pos="0 0 0.072" euler="3.141593 0 0" fovy="72"/>
+                  <body name="left_finger" pos="0 0.012 0.055">
+                    <joint name="left_finger_joint" class="finger" axis="0 1 0"/>
+                    <geom name="left_finger_geom" class="finger" pos="0 0 0.025"/>
+                  </body>
+                  <body name="right_finger" pos="0 -0.012 0.055">
+                    <joint name="right_finger_joint" class="finger" axis="0 -1 0"/>
+                    <geom name="right_finger_geom" class="finger" pos="0 0 0.025"/>
+                  </body>
                 </body>
               </body>
             </body>
@@ -117,9 +124,9 @@
   </worldbody>
 
   <equality>
-    <weld name="grasp_obj0" body1="hand" body2="obj0" relpose="0 0 0.078 1 0 0 0" active="false" solref="0.004 1"/>
-    <weld name="grasp_obj1" body1="hand" body2="obj1" relpose="0 0 0.078 1 0 0 0" active="false" solref="0.004 1"/>
-    <weld name="grasp_obj2" body1="hand" body2="obj2" relpose="0 0 0.078 1 0 0 0" active="false" solref="0.004 1"/>
+    <weld name="grasp_obj0" body1="wrist_roll" body2="obj0" relpose="0 0 0.078 1 0 0 0" active="false" solref="0.004 1"/>
+    <weld name="grasp_obj1" body1="wrist_roll" body2="obj1" relpose="0 0 0.078 1 0 0 0" active="false" solref="0.004 1"/>
+    <weld name="grasp_obj2" body1="wrist_roll" body2="obj2" relpose="0 0 0.078 1 0 0 0" active="false" solref="0.004 1"/>
   </equality>
 
   <actuator>
@@ -128,11 +135,12 @@
     <position name="elbow_act" joint="joint_elbow" kp="180" kv="18" ctrlrange="-2.55 2.35"/>
     <position name="wrist_pitch_act" joint="joint_wrist_pitch" kp="100" kv="10" ctrlrange="-2.75 2.75"/>
     <position name="wrist_yaw_act" joint="joint_wrist_yaw" kp="70" kv="7" ctrlrange="-3 3"/>
+    <position name="wrist_roll_act" joint="joint_wrist_roll" kp="55" kv="6" ctrlrange="-3 3"/>
     <position name="left_finger_act" joint="left_finger_joint" kp="90" kv="5" ctrlrange="0 0.032"/>
     <position name="right_finger_act" joint="right_finger_joint" kp="90" kv="5" ctrlrange="0 0.032"/>
   </actuator>
 
   <keyframe>
-    <key name="home" qpos="0 0.20 -2.00 -1.00 0 0.028 0.028 -0.16 -0.06 0.026 1 0 0 0 0 -0.01 0.026 1 0 0 0 0.16 -0.06 0.026 1 0 0 0" ctrl="0 0.20 -2.00 -1.00 0 0.028 0.028"/>
+    <key name="home" qpos="1.5 -0.2 -1.8 -1.142 0 0 0.028 0.028 -0.16 -0.06 0.026 1 0 0 0 0 -0.01 0.026 1 0 0 0 0.16 -0.06 0.026 1 0 0 0" ctrl="1.5 -0.2 -1.8 -1.142 0 0 0.028 0.028"/>
   </keyframe>
 </mujoco>

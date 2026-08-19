@@ -5,12 +5,15 @@ from pathlib import Path
 import numpy as np
 import torch
 
+from smartpick_vla.evaluation.controller import TemporalPolicyController
 from smartpick_vla.models import (
     BehaviorCloningConfig,
     BehaviorCloningPolicy,
     ByteTextEncoder,
     CompactVLAConfig,
     CompactVLAPolicy,
+    TemporalVLAConfig,
+    TemporalVLAPolicy,
 )
 from smartpick_vla.training import load_checkpoint, save_checkpoint, supervised_train_step
 
@@ -183,3 +186,77 @@ def test_action_chunk_supervised_step_supports_padding_mask() -> None:
 
     assert result.loss >= 0.0
     assert result.gradient_norm > 0.0
+
+
+def test_temporal_vla_fuses_left_padded_history_and_trains() -> None:
+    config = TemporalVLAConfig(
+        robot_state_dim=24,
+        action_dim=5,
+        action_horizon=3,
+        observation_horizon=4,
+        d_model=32,
+        nhead=4,
+        temporal_layers=1,
+        decoder_layers=1,
+        language_layers=1,
+        feedforward_dim=64,
+        language_max_length=12,
+        vision_grid_size=2,
+        dropout=0.0,
+    )
+    model = TemporalVLAPolicy(config)
+    history_rgb = torch.randint(0, 256, (2, 4, 3, 32, 32), dtype=torch.uint8)
+    history_state = torch.randn(2, 4, 24)
+    history_mask = torch.tensor([[False, False, True, True], [False, True, True, True]])
+    actions = model(history_rgb, ["accepted", "scratch"], history_state, history_mask)
+
+    assert actions.shape == (2, 3, 5)
+    assert torch.isfinite(actions).all()
+    assert actions.abs().max() <= 1.0
+    assert model.parameter_count() > 0
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    result = supervised_train_step(
+        model,
+        optimizer,
+        {
+            "rgb": history_rgb[:, -1],
+            "instruction": ["accepted", "scratch"],
+            "robot_state": history_state[:, -1],
+            "rgb_history": history_rgb,
+            "robot_state_history": history_state,
+            "history_mask": history_mask,
+            "action": torch.empty(2, 3, 5).uniform_(-1.0, 1.0),
+            "action_mask": torch.tensor([[1, 1, 0], [1, 1, 1]], dtype=torch.bool),
+        },
+    )
+    assert result.loss >= 0.0
+    assert result.gradient_norm > 0.0
+
+
+def test_temporal_controller_preserves_observation_history() -> None:
+    config = TemporalVLAConfig(
+        d_model=32,
+        nhead=4,
+        temporal_layers=1,
+        decoder_layers=1,
+        language_layers=1,
+        feedforward_dim=64,
+        language_max_length=12,
+        vision_grid_size=2,
+        observation_horizon=3,
+        action_horizon=2,
+    )
+    controller = TemporalPolicyController(TemporalVLAPolicy(config))
+    observation = {
+        "rgb": np.zeros((32, 32, 3), dtype=np.uint8),
+        "robot_state": np.zeros(24, dtype=np.float32),
+        "instruction": "sort the accepted part",
+    }
+    first = controller.act(observation)
+    observation["rgb"] = np.full((32, 32, 3), 17, dtype=np.uint8)
+    second = controller.act(observation)
+
+    assert first.action.shape == (5,)
+    assert second.action.shape == (5,)
+    assert first.replanned and second.replanned

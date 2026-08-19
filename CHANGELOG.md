@@ -6,6 +6,37 @@ intends to use semantic versioning after its first tagged release.
 
 ## [Unreleased]
 
+### Added
+
+- Camera-clear six-axis home pose selected by fixed-seed visibility/collision
+  checks, with a seed-909 top-camera visibility regression test.
+- Versioned `vision_six_axis_release_v2` synthetic perception dataset,
+  spatial-heatmap RGB localizer checkpoint, and recorded 15-seed visual
+  closed-loop simulation evidence.
+- Optional six-axis simulator control with a sixth tool-roll joint, a 29D
+  state/6D action contract, and preserved legacy five-axis compatibility.
+- Ordered one-to-three-object missions with language instruction handoff after
+  each completed sort, plus mission-aware privileged IK demonstrations.
+- Synthetic multi-view MuJoCo perception export with RGB, depth, segmentation
+  masks, visible-pixel counts, boxes, actions, language, hashes, and explicit
+  synthetic-data provenance.
+- Copied-state predictive simulator safety filter with geometric motion scaling
+  and per-episode intervention reports in benchmark metadata.
+- Six-axis mission/safety/perception configs, regression coverage, and recorded
+  upgrade smoke artifacts with a visual mission showcase.
+- History-aware Temporal VLA policy, episode-safe observation-history dataset
+  windows, temporal evaluation controller, and a reproducible smoke config.
+- Camera-stress domain randomization with image noise, partial occlusion, and
+  bounded visual latency, plus an optional paired `perception` suite.
+- XiaoU pixel-homography to six-axis planning-preview adapter with complete
+  grasp-profile validation, ROS 2-compatible pose previews, and no hardware
+  transport path.
+
+### Safety
+
+- XiaoU profiles with unknown heights are rejected rather than given default
+  numeric grasp values; all XiaoU output remains `planning_only=true`.
+
 ## [0.1.1] - 2026-07-17
 
 ### Changed

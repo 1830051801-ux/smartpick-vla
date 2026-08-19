@@ -1,0 +1,47 @@
+evaluation:
+  seeds: [901, 902, 903, 904, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 915]
+  image_size: 96
+  max_episode_steps: 240
+  mission_length: 1
+  instruction_split: paraphrase
+  ood_layout: true
+  grasp_assist: true
+  calibration_reference_pixel_noise_std: 0.0
+  gif_seeds: [901]
+  gif_frame_stride: 3
+  device: auto
+
+  controller:
+    minimum_detection_confidence: 0.55
+    translation_step_m: 0.025
+    waypoint_tolerance_m: 0.018
+    pregrasp_z_m: 0.19
+    grasp_z_m: 0.10
+    transport_z_m: 0.16
+    release_z_m: 0.105
+    close_hold_steps: 3
+    release_hold_steps: 3
+    confirmation_frames: 3
+    maximum_confirmation_spread_m: 0.030
+
+  safety_filter:
+    lookahead_control_steps: 2
+    minimum_motion_scale: 0.125
+    scale_decay: 0.5
+    allow_finger_table_contact: true
+
+  domain_randomization:
+    enabled: true
+    object_mass_scale: [0.8, 1.2]
+    friction_scale: [0.8, 1.2]
+    camera_position_std_m: 0.004
+    camera_fovy_delta_deg: 1.0
+    light_intensity_scale: [0.85, 1.15]
+    object_color_jitter: 0.05
+    robot_state_noise_std: 0.001
+    detection_noise_std_m: 0.0
+    control_delay_steps: [0, 1]
+    image_noise_std_px: 2.0
+    image_occlusion_probability: 0.10
+    image_occlusion_max_fraction: 0.06
+    vision_latency_frames: [0, 1]

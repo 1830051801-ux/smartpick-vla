@@ -24,8 +24,12 @@ def test_generated_dataset_retains_attempt_accounting_and_chunks(tmp_path: Path)
     )
     arrays = load_trajectory_npz(destination)
     dataset = TrajectoryDataset(destination, action_horizon=8)
+    temporal_dataset = TrajectoryDataset(destination, action_horizon=8, observation_horizon=4)
     final_index_of_first = int(np.flatnonzero(arrays["episode_id"] == 0)[-1])
     sample = dataset[final_index_of_first]
+    first_sample = temporal_dataset[0]
+    first_index_of_second = int(np.flatnonzero(arrays["episode_id"] == 1)[0])
+    second_episode_first_sample = temporal_dataset[first_index_of_second]
 
     assert manifest["attempted_episodes"] == 2
     assert manifest["successful_episodes"] == 2
@@ -33,6 +37,10 @@ def test_generated_dataset_retains_attempt_accounting_and_chunks(tmp_path: Path)
     assert sample["action"].shape == (8, 5)
     assert sample["action_mask"].sum() == 1
     assert not sample["action_mask"][1:].any()
+    assert first_sample["rgb_history"].shape == (4, 3, 32, 32)
+    assert first_sample["robot_state_history"].shape == (4, 24)
+    assert first_sample["history_mask"].tolist() == [False, False, False, True]
+    assert second_episode_first_sample["history_mask"].tolist() == [False, False, False, True]
 
 
 def test_dataset_validation_rejects_cross_shape(tmp_path: Path) -> None:

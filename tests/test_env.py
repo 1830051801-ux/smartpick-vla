@@ -57,7 +57,61 @@ def test_domain_randomization_changes_declared_parameters() -> None:
     assert randomized["control_delay_steps"] in (1, 2)
     assert not np.allclose(randomized["mass_scales"], 1.0)
     assert not np.allclose(randomized["camera_offset_m"], 0.0)
+    assert info["scene_initialization"]["layout_attempts"] >= 1
+    assert info["scene_initialization"]["settle_steps"] == 80
     env.close()
+
+
+@pytest.mark.mujoco
+def test_ood_layout_does_not_spawn_inside_destination_bins() -> None:
+    env = SmartPickEnv(image_size=32, six_axis=True)
+    _, info = env.reset(seed=914, options={"task_class": "unknown", "ood_layout": True})
+    bin_geometries = {
+        geom_id for geom_id in env._obstacle_geom_ids if env.model.geom(geom_id).name != "table"
+    }
+    object_geometries = set(env._object_geom_ids)
+    for contact_index in range(env.data.ncon):
+        contact = env.data.contact[contact_index]
+        assert not (
+            (int(contact.geom1) in object_geometries and int(contact.geom2) in bin_geometries)
+            or (int(contact.geom2) in object_geometries and int(contact.geom1) in bin_geometries)
+        )
+    assert info["scene_initialization"]["settle_duration_s"] > 0.0
+    env.close()
+
+
+@pytest.mark.mujoco
+def test_perception_randomization_exposes_noise_occlusion_and_latency() -> None:
+    perception_config = DomainRandomizationConfig(
+        enabled=True,
+        object_mass_scale=(1.0, 1.0),
+        friction_scale=(1.0, 1.0),
+        camera_position_std_m=0.0,
+        camera_fovy_delta_deg=0.0,
+        light_intensity_scale=(1.0, 1.0),
+        object_color_jitter=0.0,
+        robot_state_noise_std=0.0,
+        detection_noise_std_m=0.0,
+        control_delay_steps=(0, 0),
+        image_noise_std_px=12.0,
+        image_occlusion_probability=1.0,
+        image_occlusion_max_fraction=0.20,
+        vision_latency_frames=(2, 2),
+    )
+    clean_env = SmartPickEnv(image_size=32)
+    stressed_env = SmartPickEnv(image_size=32, domain_randomization=perception_config)
+    clean_observation, _ = clean_env.reset(seed=97)
+    stressed_observation, stressed_info = stressed_env.reset(seed=97)
+
+    randomized = stressed_info["randomization"]
+    assert randomized["vision_latency_frames"] == 2
+    assert randomized["image_noise_std_px"] == 12.0
+    assert randomized["image_occlusion_probability"] == 1.0
+    assert not np.array_equal(clean_observation["rgb"], stressed_observation["rgb"])
+
+    stressed_env.step(np.zeros(5, dtype=np.float32))
+    clean_env.close()
+    stressed_env.close()
 
 
 @pytest.mark.mujoco

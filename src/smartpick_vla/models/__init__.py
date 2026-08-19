@@ -10,6 +10,12 @@ from smartpick_vla.models.residual import (
     ResidualQNetwork,
     compose_bounded_action,
 )
+from smartpick_vla.models.temporal_vla import TemporalVLAConfig, TemporalVLAPolicy
+from smartpick_vla.models.vision_localizer import (
+    VisionLocalizationPrediction,
+    VisionLocalizer,
+    VisionLocalizerConfig,
+)
 
 __all__ = [
     "BehaviorCloningConfig",
@@ -21,6 +27,11 @@ __all__ = [
     "GaussianResidualActor",
     "ResidualActionSample",
     "ResidualQNetwork",
+    "TemporalVLAConfig",
+    "TemporalVLAPolicy",
+    "VisionLocalizationPrediction",
+    "VisionLocalizer",
+    "VisionLocalizerConfig",
     "compose_bounded_action",
     "count_parameters",
 ]

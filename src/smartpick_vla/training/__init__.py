@@ -16,17 +16,29 @@ from smartpick_vla.training.supervised import (
     action_imitation_loss,
     supervised_train_step,
 )
+from smartpick_vla.training.vision import (
+    PerceptionLocalizationDataset,
+    VisionTrainingConfig,
+    load_vision_localizer,
+    localization_loss,
+    train_vision_localizer,
+)
 
 __all__ = [
     "CheckpointInfo",
     "ImitationTrainingConfig",
+    "PerceptionLocalizationDataset",
     "ResidualSAC",
     "ResidualSACConfig",
     "SupervisedStepResult",
+    "VisionTrainingConfig",
     "action_imitation_loss",
     "load_checkpoint",
     "load_trained_policy",
+    "load_vision_localizer",
+    "localization_loss",
     "save_checkpoint",
     "supervised_train_step",
     "train_imitation",
+    "train_vision_localizer",
 ]

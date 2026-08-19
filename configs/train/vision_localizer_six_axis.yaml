@@ -1,0 +1,21 @@
+training:
+  epochs: 80
+  batch_size: 96
+  learning_rate: 0.0005
+  weight_decay: 0.00001
+  validation_fraction: 0.2
+  seed: 271
+  device: auto
+  num_workers: 0
+  gradient_clip_norm: 2.0
+  camera: top
+  center_loss_weight: 1.0
+  visibility_loss_weight: 0.25
+  heatmap_loss_weight: 1.0
+
+model:
+  quality_classes: 3
+  width: 32
+  feature_grid_size: 24
+  hidden_dim: 128
+  architecture: spatial_heatmap_v1

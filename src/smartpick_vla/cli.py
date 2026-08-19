@@ -19,18 +19,38 @@ import torch
 from smartpick_vla import __version__
 from smartpick_vla.data.expert import IKWaypointExpert
 from smartpick_vla.data.generate import GenerationConfig, generate_expert_dataset
+from smartpick_vla.data.perception import (
+    PerceptionGenerationConfig,
+    generate_synthetic_perception_dataset,
+)
 from smartpick_vla.envs import SmartPickEnv
 from smartpick_vla.envs.randomization import DomainRandomizationConfig
 from smartpick_vla.evaluation.benchmark import BenchmarkConfig, run_benchmark
 from smartpick_vla.evaluation.plots import plot_grouped_evaluation, plot_learning_curves
 from smartpick_vla.evaluation.residual_controller import ResidualPolicyController
-from smartpick_vla.real import RealLogReplay, load_real_config, load_real_log
+from smartpick_vla.evaluation.safety_filter import PredictiveSafetyFilterConfig
+from smartpick_vla.evaluation.vision_controller import (
+    VisionEvaluationConfig,
+    build_simulated_planar_calibration,
+    run_vision_guided_evaluation,
+)
+from smartpick_vla.real import (
+    RealLogReplay,
+    XiaoUDetection,
+    build_xiaou_plan_preview,
+    load_real_config,
+    load_real_log,
+    load_xiaou_grasp_profiles,
+    load_xiaou_homography,
+    save_xiaou_plan_preview,
+)
 from smartpick_vla.training.imitation import (
     ImitationTrainingConfig,
     load_trained_policy,
     train_imitation,
 )
 from smartpick_vla.training.online_residual import ResidualOnlineConfig, train_residual_online
+from smartpick_vla.training.vision import VisionTrainingConfig, train_vision_localizer
 from smartpick_vla.utils.config import load_config
 
 
@@ -93,6 +113,75 @@ def _command_generate(args: argparse.Namespace) -> int:
             "attempted_episodes": manifest["attempted_episodes"],
             "successful_episodes": manifest["successful_episodes"],
             "transitions": manifest["statistics"]["transitions"],
+        }
+    )
+    return 0
+
+
+def _command_generate_perception(args: argparse.Namespace) -> int:
+    payload = load_config(args.config)
+    generation = PerceptionGenerationConfig(**payload.get("generation", {}))
+    randomization = DomainRandomizationConfig.from_dict(payload.get("domain_randomization"))
+    manifest = generate_synthetic_perception_dataset(
+        args.output,
+        config=generation,
+        domain_config=randomization,
+    )
+    _json_print(
+        {
+            "dataset": str(Path(args.output)),
+            "samples": manifest["samples"],
+            "views": manifest["views"],
+            "robot_state_dim": manifest["robot_state_dim"],
+            "action_dim": manifest["action_dim"],
+            "synthetic_data": True,
+        }
+    )
+    return 0
+
+
+def _command_vision_calibrate(args: argparse.Namespace) -> int:
+    """Generate a persisted nine-point top-camera calibration fixture."""
+
+    environment = SmartPickEnv(image_size=args.image_size, six_axis=True)
+    try:
+        environment.reset(seed=args.seed)
+        calibration = build_simulated_planar_calibration(
+            environment,
+            pixel_noise_std=args.reference_pixel_noise_std,
+        )
+        destination = calibration.save(args.output)
+        _json_print(
+            {
+                "output": str(destination),
+                "camera": calibration.camera_name,
+                "arm_variant": "six_axis",
+                "reference_point_count": int(calibration.reference_pixels.shape[0]),
+                "fit_rmse_mm": calibration.fit_rmse_mm,
+            }
+        )
+    finally:
+        environment.close()
+    return 0
+
+
+def _command_train_vision(args: argparse.Namespace) -> int:
+    payload = load_config(args.config)
+    training = VisionTrainingConfig(**payload["training"])
+    manifest = train_vision_localizer(
+        args.dataset,
+        args.output,
+        training_config=training,
+        model_options=payload.get("model"),
+    )
+    _json_print(
+        {
+            "output": str(Path(args.output)),
+            "best_validation_mean_pixel_error": manifest["best_validation_mean_pixel_error"],
+            "best_epoch": manifest["best_epoch"],
+            "total_parameters": manifest["total_parameters"],
+            "training_episodes": manifest["training_episodes"],
+            "validation_episodes": manifest["validation_episodes"],
         }
     )
     return 0
@@ -209,6 +298,27 @@ def _command_evaluate(args: argparse.Namespace) -> int:
     randomization = DomainRandomizationConfig.from_dict(
         payload.get("physics_randomization", {"enabled": True})
     )
+    perception_randomization = DomainRandomizationConfig.from_dict(
+        payload.get(
+            "perception_randomization",
+            {
+                "enabled": True,
+                "object_mass_scale": [1.0, 1.0],
+                "friction_scale": [1.0, 1.0],
+                "camera_position_std_m": 0.0,
+                "camera_fovy_delta_deg": 0.0,
+                "light_intensity_scale": [1.0, 1.0],
+                "object_color_jitter": 0.0,
+                "robot_state_noise_std": 0.0,
+                "detection_noise_std_m": 0.0,
+                "control_delay_steps": [0, 0],
+                "image_noise_std_px": 14.0,
+                "image_occlusion_probability": 0.55,
+                "image_occlusion_max_fraction": 0.20,
+                "vision_latency_frames": [1, 3],
+            },
+        )
+    )
     config = BenchmarkConfig(
         seeds=seeds,
         suites=tuple(payload["suites"]),
@@ -217,7 +327,15 @@ def _command_evaluate(args: argparse.Namespace) -> int:
         max_episode_steps=int(payload.get("max_episode_steps", 180)),
         device=args.device,
         replan_interval=int(payload.get("replan_interval", 1)),
+        six_axis=bool(payload.get("six_axis", False)),
+        mission_length=int(payload.get("mission_length", 1)),
+        safety_filter=(
+            None
+            if payload.get("safety_filter") is None
+            else PredictiveSafetyFilterConfig(**payload["safety_filter"])
+        ),
         physics_randomization=randomization,
+        perception_randomization=perception_randomization,
         gif_seeds=(seeds[0],) if args.gif else (),
         gif_frame_stride=int(payload.get("gif_frame_stride", 2)),
     )
@@ -235,6 +353,30 @@ def _command_evaluate(args: argparse.Namespace) -> int:
             "episodes_csv": str(run.artifacts.episode_csv),
             "summary_json": str(run.artifacts.summary_json),
             "media": [str(item.gif_path) for item in run.media],
+        }
+    )
+    return 0
+
+
+def _command_evaluate_vision(args: argparse.Namespace) -> int:
+    payload = load_config(args.config)
+    evaluation_payload = payload.get("evaluation", payload)
+    config = VisionEvaluationConfig.from_dict(evaluation_payload)
+    summary = run_vision_guided_evaluation(
+        args.checkpoint,
+        args.output,
+        config=config,
+    )
+    _json_print(
+        {
+            "output": str(Path(args.output)),
+            "success_rate": summary["aggregate"]["success_rate"],
+            "mean_localization_error_mm": summary["aggregate"]["mean_localization_error_mm"],
+            "task_selection_accuracy": summary["aggregate"]["task_selection_accuracy"],
+            "mean_perception_to_action_latency_ms": summary["aggregate"][
+                "mean_perception_to_action_latency_ms"
+            ],
+            "media": summary["artifacts"]["gifs"],
         }
     )
     return 0
@@ -289,6 +431,33 @@ def _command_real_replay(args: argparse.Namespace) -> int:
             "episodes": summaries,
         }
     )
+    return 0
+
+
+def _command_xiaou_preview(args: argparse.Namespace) -> int:
+    """Create a planning-only XiaoU six-axis target preview."""
+
+    homography = load_xiaou_homography(args.homography)
+    profiles = load_xiaou_grasp_profiles(args.profiles)
+    detection = XiaoUDetection(
+        label=args.label,
+        u_px=args.u_px,
+        v_px=args.v_px,
+        confidence=args.confidence,
+        stamp_s=args.stamp_s,
+    )
+    preview = build_xiaou_plan_preview(
+        detection,
+        homography=homography,
+        profiles=profiles,
+        task_id=args.task_id,
+        minimum_confidence=args.minimum_confidence,
+        maximum_calibration_error_mm=args.maximum_calibration_error_mm,
+    )
+    payload = preview.to_dict()
+    if args.output is not None:
+        payload["output"] = str(save_xiaou_plan_preview(preview, args.output))
+    _json_print(payload)
     return 0
 
 
@@ -348,7 +517,36 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument("--output", required=True)
     generate.set_defaults(handler=_command_generate)
 
-    train = subparsers.add_parser("train", help="train BC or Compact VLA from demonstrations")
+    perception = subparsers.add_parser(
+        "generate-perception",
+        help="collect synthetic multi-view RGB-D and instance labels from MuJoCo",
+    )
+    perception.add_argument("--config", required=True)
+    perception.add_argument("--output", required=True)
+    perception.set_defaults(handler=_command_generate_perception)
+
+    calibration = subparsers.add_parser(
+        "vision-calibrate",
+        help="save a nine-point top-camera calibration artifact for six-axis vision control",
+    )
+    calibration.add_argument("--output", required=True)
+    calibration.add_argument("--seed", type=int, default=721)
+    calibration.add_argument("--image-size", type=int, default=64)
+    calibration.add_argument("--reference-pixel-noise-std", type=float, default=0.0)
+    calibration.set_defaults(handler=_command_vision_calibrate)
+
+    train_vision = subparsers.add_parser(
+        "train-vision",
+        help="train a class-conditioned RGB target localizer from synthetic labels",
+    )
+    train_vision.add_argument("--config", required=True)
+    train_vision.add_argument("--dataset", required=True)
+    train_vision.add_argument("--output", required=True)
+    train_vision.set_defaults(handler=_command_train_vision)
+
+    train = subparsers.add_parser(
+        "train", help="train BC, Compact VLA, or Temporal VLA from demonstrations"
+    )
     train.add_argument("--config", required=True)
     train.add_argument("--dataset", required=True)
     train.add_argument("--output", required=True)
@@ -364,7 +562,7 @@ def build_parser() -> argparse.ArgumentParser:
     residual.set_defaults(handler=_command_train_residual)
 
     evaluate = subparsers.add_parser(
-        "evaluate", help="run paired ID/OOD/paraphrase/physics evaluation"
+        "evaluate", help="run paired ID/OOD/paraphrase/physics/perception evaluation"
     )
     evaluate.add_argument("--config", required=True)
     evaluate.add_argument("--method", action="append", default=[], metavar="NAME=CHECKPOINT")
@@ -379,6 +577,15 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--device", default="cpu")
     evaluate.add_argument("--gif", action="store_true")
     evaluate.set_defaults(handler=_command_evaluate)
+
+    evaluate_vision = subparsers.add_parser(
+        "evaluate-vision",
+        help="evaluate RGB + calibration six-axis visual closed-loop sorting",
+    )
+    evaluate_vision.add_argument("--config", required=True)
+    evaluate_vision.add_argument("--checkpoint", required=True)
+    evaluate_vision.add_argument("--output", required=True)
+    evaluate_vision.set_defaults(handler=_command_evaluate_vision)
 
     demo = subparsers.add_parser("demo-expert", help="render a fixed-seed IK expert GIF")
     demo.add_argument("--output", required=True)
@@ -401,6 +608,23 @@ def build_parser() -> argparse.ArgumentParser:
     replay.add_argument("--log", required=True)
     replay.add_argument("--resample", action="store_true")
     replay.set_defaults(handler=_command_real_replay)
+
+    xiaou_preview = subparsers.add_parser(
+        "xiaou-preview",
+        help="create a planning-only six-axis target preview from a XiaoU camera detection",
+    )
+    xiaou_preview.add_argument("--homography", required=True)
+    xiaou_preview.add_argument("--profiles", required=True)
+    xiaou_preview.add_argument("--label", required=True)
+    xiaou_preview.add_argument("--u-px", type=float, required=True)
+    xiaou_preview.add_argument("--v-px", type=float, required=True)
+    xiaou_preview.add_argument("--confidence", type=float, default=0.90)
+    xiaou_preview.add_argument("--stamp-s", type=float, default=0.0)
+    xiaou_preview.add_argument("--task-id", default="xiaou-plan-preview")
+    xiaou_preview.add_argument("--minimum-confidence", type=float, default=0.55)
+    xiaou_preview.add_argument("--maximum-calibration-error-mm", type=float, default=2.0)
+    xiaou_preview.add_argument("--output")
+    xiaou_preview.set_defaults(handler=_command_xiaou_preview)
 
     report = subparsers.add_parser("report", help="regenerate plots from raw CSV files")
     report.add_argument("--training", action="append", default=[], metavar="NAME=HISTORY_CSV")

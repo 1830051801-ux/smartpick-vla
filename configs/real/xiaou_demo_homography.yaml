@@ -1,0 +1,9 @@
+# Simulation-only camera-plane calibration for the planning-preview example.
+# It is not a hardware calibration and must not be used to command a real arm.
+type: pixel_to_robot_base_mm
+homography:
+  - [1.0, 0.0, -960.0]
+  - [0.0, 1.0, -540.0]
+  - [0.0, 0.0, 1.0]
+mean_error_mm: 0.50
+max_error_mm: 1.00

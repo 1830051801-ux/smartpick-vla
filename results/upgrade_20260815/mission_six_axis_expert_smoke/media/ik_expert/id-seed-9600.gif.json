@@ -1,0 +1,41 @@
+{
+  "episode_id": "id-seed-9600",
+  "experiment_tier": "smoke",
+  "fps": 25.0,
+  "frame_count": 62,
+  "gif_file": "id-seed-9600.gif",
+  "media_type": "qualitative_episode_gif",
+  "method": "ik_expert",
+  "randomization": {
+    "camera_fovy_delta_deg": 0.0,
+    "camera_offset_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "control_delay_steps": 0,
+    "detection_noise_std_m": 0.0,
+    "enabled": false,
+    "friction_scale": 1.0,
+    "image_noise_std_px": 0.0,
+    "image_occlusion_max_fraction": 0.0,
+    "image_occlusion_probability": 0.0,
+    "light_scale": 1.0,
+    "mass_scales": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "robot_state_noise_std": 0.0,
+    "vision_latency_frames": 0
+  },
+  "reset_options": {
+    "instruction_split": "train",
+    "ood_layout": false
+  },
+  "schema_version": "1.0",
+  "seed": 9600,
+  "success": true,
+  "suite": "id",
+  "task_class": "accepted"
+}

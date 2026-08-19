@@ -1,0 +1,30 @@
+generation:
+  episodes: 360
+  frames_per_episode: 10
+  capture_stride: 5
+  seed: 721
+  image_size: 96
+  max_episode_steps: 180
+  include_depth: false
+  cameras: [top]
+  domain_randomization: true
+  noisy_expert_detection: false
+  grasp_assist: true
+  six_axis: true
+  ood_layout: true
+
+domain_randomization:
+  enabled: true
+  object_mass_scale: [0.8, 1.2]
+  friction_scale: [0.8, 1.2]
+  camera_position_std_m: 0.006
+  camera_fovy_delta_deg: 1.5
+  light_intensity_scale: [0.75, 1.25]
+  object_color_jitter: 0.07
+  robot_state_noise_std: 0.001
+  detection_noise_std_m: 0.0
+  control_delay_steps: [0, 1]
+  image_noise_std_px: 3.0
+  image_occlusion_probability: 0.15
+  image_occlusion_max_fraction: 0.08
+  vision_latency_frames: [0, 1]

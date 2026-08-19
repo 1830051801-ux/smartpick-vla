@@ -1,0 +1,13 @@
+generation:
+  episodes: 2
+  seed: 9600
+  image_size: 64
+  max_episode_steps: 450
+  domain_randomization: false
+  noisy_expert_detection: false
+  grasp_assist: true
+  six_axis: true
+  mission_length: 3
+
+domain_randomization:
+  enabled: false

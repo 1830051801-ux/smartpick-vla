@@ -1,0 +1,9 @@
+seed_start: 9600
+episodes_per_suite: 1
+suites: [id]
+image_size: 128
+max_episode_steps: 380
+replan_interval: 1
+six_axis: true
+mission_length: 3
+gif_frame_stride: 2

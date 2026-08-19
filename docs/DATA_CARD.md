@@ -21,6 +21,41 @@ termination flags, so analyses requiring those fields need an extended,
 versioned format. The generator records every attempted episode even when a
 training dataset later selects successful transitions only.
 
+### Synthetic multi-view perception exports
+
+`generate-perception` creates a separate `picksort-synthetic-perception/v1`
+NPZ contract for detector and segmentation experiments. It stores a camera-view
+axis for RGB and optional metric depth, an instance-mask image, per-view
+`bbox_xyxy` and visible-pixel labels, robot state, privileged-expert action,
+instruction, and episode/step IDs. Camera names and quality-class ordering are
+stored in the archive; the manifest records scene/data hashes and declares
+`synthetic_data: true`.
+
+Masks and boxes are rendered from MuJoCo segmentation buffers, including pixel
+occlusion. They are synthetic labels, not factory defect annotations. They are
+not read by the VLA policies unless a future experiment explicitly defines a
+new non-oracle perception-to-policy contract.
+
+### Current six-axis release dataset
+
+`datasets/generated/vision_six_axis_release_v2.npz` is the current versioned
+single-view release archive. It contains 360 episodes x 10 captured frames
+(3,600 RGB frames at 96 x 96), six-dimensional expert actions, 29-dimensional
+robot state, top-camera projected object-origin keypoints, visibility labels,
+language strings, and episode/step identifiers. The adjacent manifest records
+the data and scene SHA-256 hashes, the episode split inputs, randomization
+values, runtime versions, and the following provenance disclosures:
+
+- synthetic MuJoCo data, not physical-camera data;
+- privileged IK expert used for action labels;
+- `grasp_assist=true` during collection;
+- `physical_robot_data=false`.
+
+The release model uses an episode-disjoint 80/20 split. The best validation
+localization error is 1.606 px for `checkpoints/vision_six_axis_release_v2/best.pt`.
+These values describe label prediction on held-out simulated episodes; they do
+not measure defect-detection accuracy or real-camera localization.
+
 ### Real logs
 
 Compatible JSONL logs may be imported from an external robot system. A real log
@@ -45,7 +80,7 @@ fields; not every compact NPZ field is duplicated at episode level:
 - system, calibration, and randomization metadata;
 - ordered step records.
 
-Step-level fields include timestamp, robot state, five-dimensional action,
+Step-level physical-interface fields include timestamp, robot state, five-dimensional action,
 reward, terminated/truncated flags, and optional image reference. Real-log
 extensions can also carry camera timestamps, detections, joint states, EEF
 pose, controller status, and calibration identifiers.
@@ -59,6 +94,8 @@ The canonical physical action is:
 It is expressed in `base_link`; the gripper range is `[-1,1]`. Import rejects a
 different shape, non-finite values, invalid timestamps, unknown units, or a
 missing/incorrect frame unless an explicit calibrated conversion is supplied.
+The six-axis simulator contract is separate: it adds `droll`, uses 29D state,
+and must not be sent to the legacy XiaoU physical action interface.
 
 ## Storage and media
 

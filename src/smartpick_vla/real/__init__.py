@@ -46,6 +46,17 @@ from .types import (
     RobotState,
     zero_chunk_like,
 )
+from .xiaou import (
+    XiaoUDetection,
+    XiaoUGraspProfile,
+    XiaoUHomography,
+    XiaoUPlanPreview,
+    XiaoUPoseTarget,
+    build_xiaou_plan_preview,
+    load_xiaou_grasp_profiles,
+    load_xiaou_homography,
+    save_xiaou_plan_preview,
+)
 
 __all__ = [
     "ACTION_DIM",
@@ -79,13 +90,22 @@ __all__ = [
     "SafetySupervisor",
     "SafetyViolation",
     "SystemParameters",
+    "XiaoUDetection",
+    "XiaoUGraspProfile",
+    "XiaoUHomography",
+    "XiaoUPlanPreview",
+    "XiaoUPoseTarget",
+    "build_xiaou_plan_preview",
     "estimate_rigid_transform",
     "load_calibration",
     "load_real_config",
     "load_real_log",
+    "load_xiaou_grasp_profiles",
+    "load_xiaou_homography",
     "resample_episode",
     "save_calibration",
     "save_real_log",
+    "save_xiaou_plan_preview",
     "transform_step_to_base",
     "zero_chunk_like",
 ]

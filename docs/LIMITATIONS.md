@@ -7,6 +7,9 @@ end-to-end scripts do not make it a production manipulation system.
 
 - The default five-axis arm is built from simple MuJoCo primitives, not a
   validated dynamics model of a named commercial robot.
+- The optional sixth tool-roll joint adds a simulator action/state contract; it
+  does not make the scene a calibrated six-axis industrial-robot model or a
+  validated kinematic match for XiaoU.
 - Actuator gains, joint friction, compliance, contact material, camera model,
   and timing are approximate until fitted from identified hardware.
 - The optional contact-gated equality constraint stabilizes grasps. Results
@@ -14,6 +17,9 @@ end-to-end scripts do not make it a production manipulation system.
 - Collision classification depends on named MuJoCo contacts and cannot capture
   cable strain, torque overload, pinch hazards, or workspace obstacles absent
   from the scene.
+- The predictive safety filter only rolls copied simulator state forward. Its
+  table-contact accommodation is a model-specific workaround, not a physical
+  contact policy or a safety certification.
 - Simulation cycle time is not wall-clock throughput and does not include real
   perception, communication, PLC, conveyor, or recovery latency.
 
@@ -29,6 +35,8 @@ end-to-end scripts do not make it a production manipulation system.
   real optical or dynamic variation.
 - Detection-coordinate noise is an interface perturbation. It does not replace
   evaluation with a real detector.
+- Multi-view masks, boxes, and depth are MuJoCo synthetic labels. They do not
+  establish real camera calibration, inspection accuracy, or a trained detector.
 
 ## Model capacity and language
 
@@ -63,6 +71,13 @@ end-to-end scripts do not make it a production manipulation system.
   intervals instead of ranking methods by a few percentage points.
 - Checkpoints can depend on dependency versions and preprocessing metadata;
   loading a weight file without its resolved configuration is unsupported.
+
+The `vision_six_axis_release_v2` run reached 15/15 successful simulated
+episodes on its fixed 15-seed suite. This is useful regression evidence for the
+implemented RGB-to-action path, but the sample is too small for a reliability
+claim. The camera-clear home pose addresses one known reset self-occlusion case;
+it does not solve arbitrary occlusion or guarantee a valid starting pose on a
+different robot or camera mount.
 
 ## Real2Sim2Real and hardware
 

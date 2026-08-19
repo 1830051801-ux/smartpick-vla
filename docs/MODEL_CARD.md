@@ -14,6 +14,22 @@ This card describes the architecture and reporting contract. It does not claim
 that a particular checkpoint has been trained or achieved a particular score.
 Every distributed checkpoint requires its own metadata and evaluation summary.
 
+### RGB spatial localizer
+
+The six-axis visual closed-loop path uses a separate class-conditioned RGB
+localizer rather than an action policy. `spatial_heatmap_v1` retains a spatial
+feature grid, appends coordinate channels, predicts one heatmap and visibility
+logit per quality class, and uses soft-argmax for the grasp-keypoint estimate.
+The controller combines that prediction with a persisted camera homography and
+the parsed language task; it does not pass MuJoCo object poses to the model.
+
+The current checkpoint is
+`checkpoints/vision_six_axis_release_v2/best.pt` (305,702 parameters). Its
+episode-disjoint synthetic validation error is 1.606 px, with a separately
+recorded 15-seed closed-loop simulation evaluation in
+`results/vision_guided_six_axis_release_v2`. These are simulated results, not
+real-camera or real-robot measurements.
+
 ## Intended use
 
 - Research and education on language-conditioned simulated manipulation.

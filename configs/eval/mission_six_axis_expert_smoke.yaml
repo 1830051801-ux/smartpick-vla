@@ -1,0 +1,21 @@
+seed_start: 9600
+episodes_per_suite: 2
+suites: [id, ood, physics]
+image_size: 64
+max_episode_steps: 380
+replan_interval: 1
+six_axis: true
+mission_length: 3
+gif_frame_stride: 4
+
+physics_randomization:
+  enabled: true
+  object_mass_scale: [0.75, 1.25]
+  friction_scale: [0.75, 1.25]
+  camera_position_std_m: 0.006
+  camera_fovy_delta_deg: 1.5
+  light_intensity_scale: [0.8, 1.2]
+  object_color_jitter: 0.06
+  robot_state_noise_std: 0.001
+  detection_noise_std_m: 0.002
+  control_delay_steps: [0, 1]

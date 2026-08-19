@@ -19,14 +19,20 @@ from smartpick_vla.models import (
     BehaviorCloningPolicy,
     CompactVLAConfig,
     CompactVLAPolicy,
+    TemporalVLAConfig,
+    TemporalVLAPolicy,
 )
 from smartpick_vla.training.checkpoint import load_checkpoint_payload, save_checkpoint
-from smartpick_vla.training.supervised import action_imitation_loss, supervised_train_step
+from smartpick_vla.training.supervised import (
+    action_imitation_loss,
+    policy_forward_from_batch,
+    supervised_train_step,
+)
 from smartpick_vla.utils.io import atomic_write_json
 from smartpick_vla.utils.provenance import sha256_file
 from smartpick_vla.utils.seed import seed_everything
 
-PolicyKind = Literal["bc", "compact_vla"]
+PolicyKind = Literal["bc", "compact_vla", "temporal_vla"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,13 +72,16 @@ def _resolve_device(requested: str) -> torch.device:
 def _build_policy(
     policy: PolicyKind,
     model_options: dict[str, Any] | None,
-) -> tuple[nn.Module, BehaviorCloningConfig | CompactVLAConfig]:
+) -> tuple[nn.Module, BehaviorCloningConfig | CompactVLAConfig | TemporalVLAConfig]:
     options = dict(model_options or {})
     if policy == "bc":
         bc_config = BehaviorCloningConfig(**options)
         return BehaviorCloningPolicy(bc_config), bc_config
-    vla_config = CompactVLAConfig(**options)
-    return CompactVLAPolicy(vla_config), vla_config
+    if policy == "compact_vla":
+        vla_config = CompactVLAConfig(**options)
+        return CompactVLAPolicy(vla_config), vla_config
+    temporal_config = TemporalVLAConfig(**options)
+    return TemporalVLAPolicy(temporal_config), temporal_config
 
 
 def _episode_split(
@@ -120,15 +129,22 @@ def train_imitation(
         if initial_extra.get("policy_kind") != training_config.policy:
             raise ValueError("initial checkpoint policy kind does not match training config")
         model.load_state_dict(initial_payload["model_state"])
+    observation_horizon = 1
     if training_config.policy == "bc":
         action_horizon = 1
-    else:
+    elif training_config.policy == "compact_vla":
         if not isinstance(model_config, CompactVLAConfig):
             raise TypeError("compact_vla policy requires CompactVLAConfig")
         action_horizon = model_config.action_horizon
+    else:
+        if not isinstance(model_config, TemporalVLAConfig):
+            raise TypeError("temporal_vla policy requires TemporalVLAConfig")
+        action_horizon = model_config.action_horizon
+        observation_horizon = model_config.observation_horizon
     dataset = TrajectoryDataset(
         dataset_path,
         action_horizon=action_horizon,
+        observation_horizon=observation_horizon,
         successful_only=True,
     )
     train_indices, validation_indices, train_episodes, validation_episodes = _episode_split(
@@ -284,15 +300,17 @@ def _validation_loss(
     losses: list[float] = []
     weights: list[int] = []
     for batch in loader:
-        rgb = batch["rgb"].to(device)
-        state = batch["robot_state"].to(device)
-        target = batch["action"].to(device)
-        prediction = model(rgb, batch["instruction"], state)
-        mask = batch.get("action_mask")
-        if mask is not None:
-            mask = mask.to(device)
+        first_parameter = next(model.parameters(), None)
+        if first_parameter is None:
+            raise ValueError("model has no parameters")
+        prediction, target, mask = policy_forward_from_batch(
+            model,
+            batch,
+            device=device,
+            dtype=first_parameter.dtype,
+        )
         loss = action_imitation_loss(prediction, target, mask=mask, loss_kind=loss_kind)
-        batch_size = int(rgb.shape[0])
+        batch_size = int(target.shape[0])
         losses.append(float(loss.cpu()))
         weights.append(batch_size)
     return float(np.average(losses, weights=weights))
@@ -309,7 +327,9 @@ def load_trained_policy(
     extra = payload.get("extra", {})
     policy_kind = extra.get("policy_kind")
     model_config = extra.get("model_config")
-    if policy_kind not in ("bc", "compact_vla") or not isinstance(model_config, dict):
+    if policy_kind not in ("bc", "compact_vla", "temporal_vla") or not isinstance(
+        model_config, dict
+    ):
         raise ValueError("checkpoint lacks policy construction metadata")
     model, _ = _build_policy(policy_kind, model_config)
     model.load_state_dict(payload["model_state"])

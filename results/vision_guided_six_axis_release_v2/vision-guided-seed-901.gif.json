@@ -1,0 +1,20 @@
+{
+  "calibration_file": "results\\vision_guided_six_axis_release_v2\\calibrations\\seed_901.json",
+  "controller_inputs": [
+    "rgb",
+    "robot_state",
+    "instruction",
+    "calibration"
+  ],
+  "episode_id": "vision-guided-seed-901",
+  "fps": 10.0,
+  "frame_count": 34,
+  "gif_file": "vision-guided-seed-901.gif",
+  "media_type": "qualitative_episode_gif",
+  "method": "rgb_homography_six_axis",
+  "schema_version": "1.0",
+  "seed": 901,
+  "success": true,
+  "suite": "vision_guided",
+  "task_class": "scratch"
+}

@@ -1,0 +1,47 @@
+{
+  "confidence_interval": "Wilson score interval, 95%, episode-level",
+  "episode_count": 1,
+  "group_by": [
+    "suite",
+    "method"
+  ],
+  "groups": [
+    {
+      "collision_count": 1,
+      "collision_rate": 1.0,
+      "collision_rate_wilson95_high": 1.0,
+      "collision_rate_wilson95_low": 0.20654931437723745,
+      "episode_count": 1,
+      "group": {
+        "method": "ik_expert",
+        "suite": "id"
+      },
+      "mean_action_smoothness": 0.21223138272762299,
+      "mean_episode_return": 28.562190597289582,
+      "mean_inference_latency_ms": 0.0658741805413318,
+      "mean_inference_latency_p95_ms": 0.1132599980337545,
+      "mean_p95_residual_magnitude": null,
+      "mean_residual_magnitude": null,
+      "mean_success_cycle_time_s": 9.76,
+      "success_count": 1,
+      "success_rate": 1.0,
+      "success_rate_wilson95_high": 1.0,
+      "success_rate_wilson95_low": 0.20654931437723745,
+      "successful_cycle_count": 1,
+      "timeout_count": 0,
+      "timeout_rate": 0.0,
+      "timeout_rate_wilson95_high": 0.7934506856227626,
+      "timeout_rate_wilson95_low": 0.0,
+      "wrong_bin_count": 0,
+      "wrong_bin_rate": 0.0,
+      "wrong_bin_rate_wilson95_high": 0.7934506856227626,
+      "wrong_bin_rate_wilson95_low": 0.0,
+      "wrong_pick_count": 0,
+      "wrong_pick_rate": 0.0,
+      "wrong_pick_rate_wilson95_high": 0.7934506856227626,
+      "wrong_pick_rate_wilson95_low": 0.0
+    }
+  ],
+  "schema_version": "1.0",
+  "source_episode_csv": "eval_episodes.csv"
+}

@@ -7,7 +7,7 @@ import math
 import re
 import time
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from itertools import pairwise
 from pathlib import Path
 from typing import Any, Literal, Protocol
@@ -20,11 +20,19 @@ from smartpick_vla.envs.randomization import DomainRandomizationConfig
 from smartpick_vla.envs.smartpick_env import SmartPickEnv
 from smartpick_vla.envs.tasks import InstructionSplit
 from smartpick_vla.evaluation.artifacts import EvaluationArtifacts, write_evaluation_artifacts
-from smartpick_vla.evaluation.controller import ActionDecision, LearnedPolicyController
+from smartpick_vla.evaluation.controller import (
+    ActionDecision,
+    LearnedPolicyController,
+    TemporalPolicyController,
+)
 from smartpick_vla.evaluation.media import save_episode_gif
 from smartpick_vla.evaluation.metrics import EpisodeAccumulator, EpisodeResult
+from smartpick_vla.evaluation.safety_filter import (
+    PredictiveSafetyFilter,
+    PredictiveSafetyFilterConfig,
+)
 
-SuiteName = Literal["id", "paraphrase", "ood", "physics"]
+SuiteName = Literal["id", "paraphrase", "ood", "physics", "perception"]
 ExperimentTier = Literal["smoke", "local-benchmark", "long"]
 
 
@@ -36,6 +44,7 @@ class BenchmarkSuite:
     instruction_split: InstructionSplit = "train"
     ood_layout: bool = False
     physics_randomization: bool = False
+    perception_randomization: bool = False
 
     @property
     def reset_options(self) -> dict[str, str | bool]:
@@ -53,6 +62,8 @@ BENCHMARK_SUITES: Mapping[SuiteName, BenchmarkSuite] = {
     "ood": BenchmarkSuite("ood", ood_layout=True),
     # Physics retains ID layout/language and enables declared domain randomization.
     "physics": BenchmarkSuite("physics", physics_randomization=True),
+    # Perception retains nominal dynamics but injects camera corruption and latency.
+    "perception": BenchmarkSuite("perception", perception_randomization=True),
 }
 
 
@@ -68,8 +79,29 @@ class BenchmarkConfig:
     grasp_assist: bool = True
     device: str = "cpu"
     replan_interval: int = 1
+    six_axis: bool = False
+    mission_length: int = 1
+    safety_filter: PredictiveSafetyFilterConfig | None = None
     physics_randomization: DomainRandomizationConfig = field(
         default_factory=lambda: DomainRandomizationConfig(enabled=True)
+    )
+    perception_randomization: DomainRandomizationConfig = field(
+        default_factory=lambda: DomainRandomizationConfig(
+            enabled=True,
+            object_mass_scale=(1.0, 1.0),
+            friction_scale=(1.0, 1.0),
+            camera_position_std_m=0.0,
+            camera_fovy_delta_deg=0.0,
+            light_intensity_scale=(1.0, 1.0),
+            object_color_jitter=0.0,
+            robot_state_noise_std=0.0,
+            detection_noise_std_m=0.0,
+            control_delay_steps=(0, 0),
+            image_noise_std_px=14.0,
+            image_occlusion_probability=0.55,
+            image_occlusion_max_fraction=0.20,
+            vision_latency_frames=(1, 3),
+        )
     )
     gif_seeds: tuple[int, ...] = ()
     gif_fps: float = 25.0
@@ -95,10 +127,20 @@ class BenchmarkConfig:
             raise ValueError("max_episode_steps must be positive")
         if self.replan_interval < 1:
             raise ValueError("replan_interval must be positive")
+        if not isinstance(self.six_axis, bool):
+            raise TypeError("six_axis must be a bool")
+        if self.mission_length < 1 or self.mission_length > 3:
+            raise ValueError("mission_length must be in [1,3]")
+        if self.safety_filter is not None and not isinstance(
+            self.safety_filter, PredictiveSafetyFilterConfig
+        ):
+            raise TypeError("safety_filter must be a PredictiveSafetyFilterConfig or None")
         if not isinstance(self.physics_randomization, DomainRandomizationConfig):
             raise TypeError("physics_randomization must be a DomainRandomizationConfig")
         if "physics" in self.suites and not self.physics_randomization.enabled:
             raise ValueError("the physics suite requires enabled domain randomization")
+        if "perception" in self.suites and not self.perception_randomization.enabled:
+            raise ValueError("the perception suite requires enabled domain randomization")
         if any(seed not in self.seeds for seed in self.gif_seeds):
             raise ValueError("gif_seeds must be a subset of evaluation seeds")
         if len(set(self.gif_seeds)) != len(self.gif_seeds):
@@ -120,6 +162,10 @@ class BenchmarkConfig:
         object.__setattr__(self, "suites", tuple(self.suites))
         object.__setattr__(self, "gif_seeds", tuple(self.gif_seeds))
         object.__setattr__(self, "summary_group_by", tuple(self.summary_group_by))
+
+    @property
+    def action_dim(self) -> int:
+        return 6 if self.six_axis else 5
 
 
 class BenchmarkController(Protocol):
@@ -173,23 +219,33 @@ def _default_environment_factory(
     suite: BenchmarkSuite,
     config: BenchmarkConfig,
 ) -> SmartPickEnv:
-    randomization = (
-        config.physics_randomization
-        if suite.physics_randomization
-        else DomainRandomizationConfig(enabled=False)
-    )
+    if suite.physics_randomization:
+        randomization = config.physics_randomization
+    elif suite.perception_randomization:
+        randomization = config.perception_randomization
+    else:
+        randomization = DomainRandomizationConfig(enabled=False)
+    environment_options: dict[str, Any] = {
+        "image_size": config.image_size,
+        "max_episode_steps": config.max_episode_steps,
+        "domain_randomization": randomization,
+        "grasp_assist": config.grasp_assist,
+    }
+    # Keep default benchmark factories compatible with older integrations that
+    # construct the legacy five-axis environment from the four original args.
+    if config.six_axis:
+        environment_options["six_axis"] = True
+    if config.mission_length != 1:
+        environment_options["mission_length"] = config.mission_length
     return SmartPickEnv(
-        image_size=config.image_size,
-        max_episode_steps=config.max_episode_steps,
-        domain_randomization=randomization,
-        grasp_assist=config.grasp_assist,
+        **environment_options,
     )
 
 
-def _validate_action(action: Any) -> np.ndarray:
+def _validate_action(action: Any, *, action_dim: int = 5) -> np.ndarray:
     array = np.asarray(action, dtype=np.float32)
-    if array.shape != (5,):
-        raise ValueError(f"controller action must have shape (5,), got {array.shape}")
+    if array.shape != (action_dim,):
+        raise ValueError(f"controller action must have shape ({action_dim},), got {array.shape}")
     if not np.isfinite(array).all():
         raise ValueError("controller action contains NaN or infinity")
     return np.clip(array, -1.0, 1.0)
@@ -209,6 +265,12 @@ def _resolve_controller(
     if source is None:
         raise ValueError(f"learned method {method!r} requires a model or controller")
     if isinstance(source, nn.Module):
+        if bool(getattr(source, "requires_observation_history", False)):
+            return TemporalPolicyController(
+                source,
+                device=config.device,
+                replan_interval=config.replan_interval,
+            )
         return LearnedPolicyController(
             source,
             device=config.device,
@@ -222,6 +284,8 @@ def _resolve_controller(
 def _controller_action(
     controller: BenchmarkController,
     observation: dict[str, Any],
+    *,
+    action_dim: int,
 ) -> tuple[np.ndarray, float, np.ndarray | None]:
     started = time.perf_counter()
     decision = controller.act(observation)
@@ -238,12 +302,16 @@ def _controller_action(
         residual = decision.residual_action
         if residual is not None:
             residual = np.asarray(residual, dtype=np.float32)
-            if residual.shape != (5,) or not np.isfinite(residual).all():
+            if residual.shape != (action_dim,) or not np.isfinite(residual).all():
                 raise ValueError("controller returned an invalid residual action")
             if decision.base_action is not None:
-                base = _validate_action(decision.base_action)
+                base = _validate_action(decision.base_action, action_dim=action_dim)
                 expected = np.clip(base + residual, -1.0, 1.0)
-                if not np.allclose(expected, _validate_action(action), atol=1e-5):
+                if not np.allclose(
+                    expected,
+                    _validate_action(action, action_dim=action_dim),
+                    atol=1e-5,
+                ):
                     raise ValueError("final action does not match base plus residual")
     else:
         action = decision
@@ -251,7 +319,7 @@ def _controller_action(
         residual = None
     if not math.isfinite(latency_ms) or latency_ms < 0:
         raise ValueError("controller returned an invalid inference latency")
-    return _validate_action(action), float(latency_ms), residual
+    return _validate_action(action, action_dim=action_dim), float(latency_ms), residual
 
 
 def _episode_identity(suite: BenchmarkSuite, seed: int) -> str:
@@ -281,8 +349,9 @@ def _run_episode(
     randomization = reset_info.get("randomization")
     if not isinstance(randomization, Mapping) or not isinstance(randomization.get("enabled"), bool):
         raise ValueError("environment reset info must contain randomization.enabled")
-    if randomization["enabled"] is not suite.physics_randomization:
-        raise RuntimeError("domain randomization must be enabled only for the physics suite")
+    randomization_expected = suite.physics_randomization or suite.perception_randomization
+    if randomization["enabled"] is not randomization_expected:
+        raise RuntimeError("domain randomization must match the declared benchmark suite")
     task_class = str(reset_info["task_class"])
     instruction = str(observation["instruction"])
     episode_id = _episode_identity(suite, seed)
@@ -293,11 +362,19 @@ def _run_episode(
             "instruction_split": suite.instruction_split,
             "ood_layout": suite.ood_layout,
             "physics_randomization": suite.physics_randomization,
+            "perception_randomization": suite.perception_randomization,
         },
         "instruction_split": reset_info.get("instruction_split"),
         "randomization": dict(randomization),
         "grasp_assist": reset_info.get("grasp_assist", config.grasp_assist),
         "privileged_expert": method == "ik_expert",
+        "arm_variant": reset_info.get(
+            "arm_variant",
+            "six_axis" if config.six_axis else "five_axis_legacy",
+        ),
+        "action_dim": config.action_dim,
+        "mission_length": config.mission_length,
+        "safety_filter": (None if config.safety_filter is None else asdict(config.safety_filter)),
     }
     accumulator = EpisodeAccumulator(
         episode_id=episode_id,
@@ -331,19 +408,37 @@ def _run_episode(
     final_info = reset_info
     executed_actions: list[np.ndarray] = []
     residual_magnitudes: list[float] = []
+    safety_interventions = 0
+    safety_rejections = 0
+    safety_motion_scales: list[float] = []
+    safety_prediction_collisions = 0
+    safety_filter: PredictiveSafetyFilter | None = None
+    if config.safety_filter is not None:
+        if not isinstance(environment, SmartPickEnv):
+            raise TypeError("predictive safety filtering requires a SmartPickEnv instance")
+        safety_filter = PredictiveSafetyFilter(environment, config=config.safety_filter)
     for step_index in range(config.max_episode_steps):
         if expert is not None:
             started = time.perf_counter()
             action, _ = expert.act()
             latency_ms = (time.perf_counter() - started) * 1000.0
-            normalized_action = _validate_action(action)
+            normalized_action = _validate_action(action, action_dim=config.action_dim)
             residual_action = None
         else:
             if controller is None:
                 raise RuntimeError("learned controller was not initialized")
             normalized_action, latency_ms, residual_action = _controller_action(
-                controller, observation
+                controller,
+                observation,
+                action_dim=config.action_dim,
             )
+        if safety_filter is not None:
+            safety = safety_filter.filter(normalized_action)
+            normalized_action = safety.action
+            safety_interventions += int(safety.intervened)
+            safety_rejections += int(safety.rejected_all_motion)
+            safety_motion_scales.append(safety.motion_scale)
+            safety_prediction_collisions += int(safety.predicted_collision)
         executed_actions.append(normalized_action.copy())
         if residual_action is not None:
             residual_magnitudes.append(float(np.linalg.norm(residual_action)))
@@ -371,6 +466,18 @@ def _run_episode(
             "contact_count": int(final_info.get("contact_count", 0)),
             "randomization": final_info.get("randomization", metadata["randomization"]),
             "control_dt": final_info.get("control_dt"),
+            "safety_filter_report": {
+                "enabled": safety_filter is not None,
+                "intervention_count": safety_interventions,
+                "intervention_rate": (
+                    0.0 if not executed_actions else safety_interventions / len(executed_actions)
+                ),
+                "rejected_all_motion_count": safety_rejections,
+                "mean_motion_scale": (
+                    None if not safety_motion_scales else float(np.mean(safety_motion_scales))
+                ),
+                "predicted_collision_action_count": safety_prediction_collisions,
+            },
         }
     )
     if "cycle_time_s" not in final_info:

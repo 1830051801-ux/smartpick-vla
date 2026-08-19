@@ -32,6 +32,14 @@ from smartpick_vla.evaluation.metrics import (
 )
 from smartpick_vla.evaluation.plots import plot_grouped_evaluation, plot_learning_curves
 from smartpick_vla.evaluation.residual_controller import ResidualPolicyController
+from smartpick_vla.evaluation.vision_controller import (
+    VisionControllerConfig,
+    VisionDecisionDiagnostics,
+    VisionEvaluationConfig,
+    VisionGuidedSixAxisController,
+    build_simulated_planar_calibration,
+    run_vision_guided_evaluation,
+)
 
 __all__ = [
     "BENCHMARK_SUITES",
@@ -47,14 +55,20 @@ __all__ = [
     "EvaluationArtifacts",
     "RateEstimate",
     "ResidualPolicyController",
+    "VisionControllerConfig",
+    "VisionDecisionDiagnostics",
+    "VisionEvaluationConfig",
+    "VisionGuidedSixAxisController",
     "aggregate_episode_results",
     "build_evaluation_summary",
+    "build_simulated_planar_calibration",
     "evaluate_method",
     "group_episode_results",
     "load_episode_results",
     "plot_grouped_evaluation",
     "plot_learning_curves",
     "run_benchmark",
+    "run_vision_guided_evaluation",
     "save_episode_gif",
     "save_episode_results",
     "save_summary_json",

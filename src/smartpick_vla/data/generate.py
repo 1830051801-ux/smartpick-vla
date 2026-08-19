@@ -29,6 +29,8 @@ class GenerationConfig:
     domain_randomization: bool = False
     noisy_expert_detection: bool = False
     grasp_assist: bool = True
+    six_axis: bool = False
+    mission_length: int = 1
 
 
 def generate_expert_dataset(
@@ -48,6 +50,8 @@ def generate_expert_dataset(
         max_episode_steps=config.max_episode_steps,
         domain_randomization=randomization,
         grasp_assist=config.grasp_assist,
+        six_axis=config.six_axis,
+        mission_length=config.mission_length,
     )
     records: dict[str, list[Any]] = {
         "rgb": [],
@@ -143,6 +147,7 @@ def generate_expert_dataset(
             "privileged_expert": True,
             "grasp_assist": config.grasp_assist,
             "physical_robot_data": False,
+            "arm_variant": env.arm_variant,
         },
     }
     atomic_write_json(destination.with_suffix(".manifest.json"), manifest)

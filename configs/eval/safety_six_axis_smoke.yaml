@@ -1,0 +1,41 @@
+seed_start: 9400
+episodes_per_suite: 2
+suites: [id, ood, physics, perception]
+image_size: 64
+max_episode_steps: 150
+replan_interval: 1
+six_axis: true
+gif_frame_stride: 3
+
+safety_filter:
+  lookahead_control_steps: 4
+  minimum_motion_scale: 0.125
+  scale_decay: 0.5
+
+physics_randomization:
+  enabled: true
+  object_mass_scale: [0.7, 1.35]
+  friction_scale: [0.65, 1.4]
+  camera_position_std_m: 0.008
+  camera_fovy_delta_deg: 2.0
+  light_intensity_scale: [0.75, 1.25]
+  object_color_jitter: 0.08
+  robot_state_noise_std: 0.002
+  detection_noise_std_m: 0.003
+  control_delay_steps: [0, 2]
+
+perception_randomization:
+  enabled: true
+  object_mass_scale: [1.0, 1.0]
+  friction_scale: [1.0, 1.0]
+  camera_position_std_m: 0.0
+  camera_fovy_delta_deg: 0.0
+  light_intensity_scale: [1.0, 1.0]
+  object_color_jitter: 0.0
+  robot_state_noise_std: 0.0
+  detection_noise_std_m: 0.0
+  control_delay_steps: [0, 0]
+  image_noise_std_px: 12.0
+  image_occlusion_probability: 0.50
+  image_occlusion_max_fraction: 0.18
+  vision_latency_frames: [1, 2]

@@ -1,0 +1,263 @@
+{
+  "action_dim": 6,
+  "bbox_shape": [
+    9,
+    3,
+    3,
+    4
+  ],
+  "dataset_file": "perception_multiview_smoke.npz",
+  "dataset_sha256": "36882cfd35856bbae73e5ef014ec21fde9837f8ca394308c84f4044641732318",
+  "disclosure": {
+    "arm_variant": "six_axis",
+    "grasp_assist": true,
+    "physical_robot_data": false,
+    "privileged_ik_expert": true,
+    "synthetic_data": true
+  },
+  "episodes": [
+    {
+      "captured_frames": 3,
+      "episode_id": 0,
+      "instruction_template_id": "train/accepted/1",
+      "randomization": {
+        "camera_fovy_delta_deg": -1.1826085447260106,
+        "camera_offset_m": [
+          -0.010426,
+          0.005331,
+          0.006373
+        ],
+        "config": {
+          "camera_fovy_delta_deg": 1.5,
+          "camera_position_std_m": 0.006,
+          "control_delay_steps": [
+            0,
+            1
+          ],
+          "detection_noise_std_m": 0.002,
+          "enabled": true,
+          "friction_scale": [
+            0.8,
+            1.2
+          ],
+          "image_noise_std_px": 3.0,
+          "image_occlusion_max_fraction": 0.08,
+          "image_occlusion_probability": 0.15,
+          "light_intensity_scale": [
+            0.8,
+            1.2
+          ],
+          "object_color_jitter": 0.06,
+          "object_mass_scale": [
+            0.8,
+            1.2
+          ],
+          "robot_state_noise_std": 0.001,
+          "vision_latency_frames": [
+            0,
+            1
+          ]
+        },
+        "control_delay_steps": 1,
+        "detection_noise_std_m": 0.002,
+        "enabled": true,
+        "friction_scale": 0.9298025751049999,
+        "image_noise_std_px": 3.0,
+        "image_occlusion_max_fraction": 0.08,
+        "image_occlusion_probability": 0.15,
+        "light_scale": 1.0534492821287849,
+        "mass_scales": [
+          0.951048,
+          0.883885,
+          1.057153
+        ],
+        "robot_state_noise_std": 0.001,
+        "vision_latency_frames": 1
+      },
+      "return": 16.062808264355056,
+      "seed": 211,
+      "steps": 89,
+      "success": true,
+      "task_class": "accepted"
+    },
+    {
+      "captured_frames": 3,
+      "episode_id": 1,
+      "instruction_template_id": "train/accepted/2",
+      "randomization": {
+        "camera_fovy_delta_deg": -0.7853374449615619,
+        "camera_offset_m": [
+          -0.001131,
+          0.010408,
+          -0.001116
+        ],
+        "config": {
+          "camera_fovy_delta_deg": 1.5,
+          "camera_position_std_m": 0.006,
+          "control_delay_steps": [
+            0,
+            1
+          ],
+          "detection_noise_std_m": 0.002,
+          "enabled": true,
+          "friction_scale": [
+            0.8,
+            1.2
+          ],
+          "image_noise_std_px": 3.0,
+          "image_occlusion_max_fraction": 0.08,
+          "image_occlusion_probability": 0.15,
+          "light_intensity_scale": [
+            0.8,
+            1.2
+          ],
+          "object_color_jitter": 0.06,
+          "object_mass_scale": [
+            0.8,
+            1.2
+          ],
+          "robot_state_noise_std": 0.001,
+          "vision_latency_frames": [
+            0,
+            1
+          ]
+        },
+        "control_delay_steps": 0,
+        "detection_noise_std_m": 0.002,
+        "enabled": true,
+        "friction_scale": 0.8693410646698643,
+        "image_noise_std_px": 3.0,
+        "image_occlusion_max_fraction": 0.08,
+        "image_occlusion_probability": 0.15,
+        "light_scale": 1.0989587637002505,
+        "mass_scales": [
+          0.917996,
+          0.992917,
+          1.114568
+        ],
+        "robot_state_noise_std": 0.001,
+        "vision_latency_frames": 1
+      },
+      "return": 16.888385809139805,
+      "seed": 212,
+      "steps": 70,
+      "success": true,
+      "task_class": "accepted"
+    },
+    {
+      "captured_frames": 3,
+      "episode_id": 2,
+      "instruction_template_id": "train/accepted/2",
+      "randomization": {
+        "camera_fovy_delta_deg": -0.70630739648332,
+        "camera_offset_m": [
+          -0.010786,
+          0.006511,
+          0.010685
+        ],
+        "config": {
+          "camera_fovy_delta_deg": 1.5,
+          "camera_position_std_m": 0.006,
+          "control_delay_steps": [
+            0,
+            1
+          ],
+          "detection_noise_std_m": 0.002,
+          "enabled": true,
+          "friction_scale": [
+            0.8,
+            1.2
+          ],
+          "image_noise_std_px": 3.0,
+          "image_occlusion_max_fraction": 0.08,
+          "image_occlusion_probability": 0.15,
+          "light_intensity_scale": [
+            0.8,
+            1.2
+          ],
+          "object_color_jitter": 0.06,
+          "object_mass_scale": [
+            0.8,
+            1.2
+          ],
+          "robot_state_noise_std": 0.001,
+          "vision_latency_frames": [
+            0,
+            1
+          ]
+        },
+        "control_delay_steps": 1,
+        "detection_noise_std_m": 0.002,
+        "enabled": true,
+        "friction_scale": 0.9584379031997752,
+        "image_noise_std_px": 3.0,
+        "image_occlusion_max_fraction": 0.08,
+        "image_occlusion_probability": 0.15,
+        "light_scale": 0.8199067366710455,
+        "mass_scales": [
+          1.082213,
+          0.961804,
+          0.958585
+        ],
+        "robot_state_noise_std": 0.001,
+        "vision_latency_frames": 1
+      },
+      "return": 17.538562088684987,
+      "seed": 213,
+      "steps": 63,
+      "success": true,
+      "task_class": "accepted"
+    }
+  ],
+  "generation": {
+    "cameras": [
+      "top",
+      "oblique",
+      "wrist"
+    ],
+    "capture_stride": 10,
+    "domain_randomization": true,
+    "episodes": 3,
+    "frames_per_episode": 3,
+    "grasp_assist": true,
+    "image_size": 64,
+    "include_depth": true,
+    "max_episode_steps": 140,
+    "noisy_expert_detection": false,
+    "seed": 211,
+    "six_axis": true
+  },
+  "instance_mask_shape": [
+    9,
+    3,
+    64,
+    64
+  ],
+  "rgb_shape": [
+    9,
+    3,
+    64,
+    64,
+    3
+  ],
+  "robot_state_dim": 29,
+  "runtime": {
+    "cuda_available": false,
+    "cuda_runtime": null,
+    "gymnasium": "1.3.0",
+    "mujoco": "3.10.0",
+    "numpy": "2.5.1",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.14 (tags/v3.13.14:fd17997, Jun 10 2026, 13:03:48) [MSC v.1944 64 bit (AMD64)]",
+    "torch": "2.13.0+cpu"
+  },
+  "samples": 9,
+  "scene_file": "smartpick_scene.xml",
+  "scene_sha256": "bc5aac0310c7e56f1be157e25b6077488f91f0bfd089f0de0c5de50e97c1557e",
+  "schema_version": "picksort-synthetic-perception/v1",
+  "views": [
+    "top",
+    "oblique",
+    "wrist"
+  ]
+}

@@ -283,3 +283,23 @@ def test_single_controller_entrypoint_and_invalid_method_contracts(tmp_path: Pat
             suites=("physics",),
             physics_randomization=DomainRandomizationConfig(enabled=False),
         )
+
+
+def test_perception_suite_uses_its_declared_randomization(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(benchmark_module, "SmartPickEnv", _FakeEnvironment)
+    config = BenchmarkConfig(
+        seeds=(11,),
+        suites=("perception",),
+        image_size=32,
+        max_episode_steps=2,
+    )
+    run = run_benchmark(tmp_path / "perception", {"learned": _TinyPolicy()}, config=config)
+
+    assert len(run.results) == 1
+    assert _FakeEnvironment.constructed_randomization == [True]
+    row = run.results[0]
+    assert row.suite == "perception"
+    assert row.metadata["suite_definition"]["perception_randomization"] is True
+    assert row.metadata["randomization"]["enabled"] is True

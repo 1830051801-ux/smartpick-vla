@@ -10,10 +10,15 @@ Use these documents as the source of truth for the corresponding topic:
 
 - [Architecture](ARCHITECTURE.md): component boundaries, observations, actions,
   policy structure, and data flow.
+- [Embodied simulation upgrade](EMBODIED_SIMULATION_UPGRADE.md): six-axis
+  control, multi-object missions, synthetic multi-view perception data,
+  predictive simulation safety filtering, and recorded evidence.
 - [Experiment protocol](EXPERIMENT_PROTOCOL.md): required baselines, splits,
   metrics, artifact layout, and claims policy.
 - [Real2Sim2Real](REAL2SIM2REAL.md): real-log import, replay, system parameters,
   and domain-randomization scope.
+- [XiaoU bridge](XIAOU_BRIDGE.md): camera homography to six-axis planning-only
+  target previews and grasp-profile completeness checks.
 - [ROS 2 dry-run](ROS2_DRY_RUN.md): ROS interfaces, validation gates, and the
   deliberate separation from hardware execution.
 - [Limitations](LIMITATIONS.md): known scientific, simulation, language, and

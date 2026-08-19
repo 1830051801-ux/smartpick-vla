@@ -57,6 +57,64 @@ def action_imitation_loss(
     return (per_action * weights).sum() / denominator
 
 
+def policy_forward_from_batch(
+    model: nn.Module,
+    batch: Mapping[str, Any],
+    *,
+    device: torch.device,
+    dtype: torch.dtype,
+) -> tuple[Tensor, Tensor, Tensor | None]:
+    """Run either a single-frame or history-aware policy from one training batch."""
+
+    required = {"rgb", "instruction", "robot_state", "action"}
+    missing = required.difference(batch)
+    if missing:
+        raise KeyError(f"batch is missing keys: {sorted(missing)}")
+    instruction = batch["instruction"]
+    if isinstance(instruction, str) or not isinstance(instruction, (Tensor, Sequence)):
+        raise TypeError("instruction must be a token tensor or a sequence of strings")
+    if isinstance(instruction, Tensor):
+        instruction = instruction.to(device)
+
+    target = _tensor_from_batch(batch["action"], "action").to(device=device, dtype=dtype)
+    mask_value = batch.get("action_mask")
+    action_mask = (
+        None
+        if mask_value is None
+        else _tensor_from_batch(mask_value, "action_mask").to(device=device)
+    )
+
+    has_rgb_history = "rgb_history" in batch
+    has_state_history = "robot_state_history" in batch
+    if has_rgb_history != has_state_history:
+        raise KeyError("temporal batches require both rgb_history and robot_state_history")
+    if not has_rgb_history:
+        rgb = _tensor_from_batch(batch["rgb"], "rgb").to(device)
+        robot_state = _tensor_from_batch(batch["robot_state"], "robot_state").to(
+            device=device, dtype=dtype
+        )
+        prediction = model(rgb=rgb, instruction=instruction, robot_state=robot_state)
+    else:
+        if "history_mask" not in batch:
+            raise KeyError("temporal batches require history_mask")
+        rgb_history = _tensor_from_batch(batch["rgb_history"], "rgb_history").to(device)
+        robot_state_history = _tensor_from_batch(
+            batch["robot_state_history"], "robot_state_history"
+        ).to(device=device, dtype=dtype)
+        history_mask = _tensor_from_batch(batch["history_mask"], "history_mask").to(device)
+        if history_mask.dtype is not torch.bool:
+            raise TypeError("history_mask must use bool dtype")
+        prediction = model(
+            rgb_history=rgb_history,
+            instruction=instruction,
+            robot_state_history=robot_state_history,
+            history_mask=history_mask,
+        )
+    if not isinstance(prediction, Tensor):
+        raise TypeError("model must return an action tensor")
+    return prediction, target, action_mask
+
+
 def supervised_train_step(
     model: nn.Module,
     optimizer: Optimizer,
@@ -68,39 +126,25 @@ def supervised_train_step(
     """Run exactly one optimizer step on a BC or Compact-VLA batch.
 
     Required keys are ``rgb``, ``instruction``, ``robot_state``, and
-    ``action``.  ``action_mask`` is optional for padded action chunks.
+    ``action``. Temporal policies additionally receive ``rgb_history``,
+    ``robot_state_history``, and ``history_mask``. ``action_mask`` is optional
+    for padded action chunks.
     """
 
     if gradient_clip_norm <= 0:
         raise ValueError("gradient_clip_norm must be positive")
-    required = {"rgb", "instruction", "robot_state", "action"}
-    missing = required.difference(batch)
-    if missing:
-        raise KeyError(f"batch is missing keys: {sorted(missing)}")
     first_parameter = next(model.parameters(), None)
     if first_parameter is None:
         raise ValueError("model has no parameters")
     device = first_parameter.device
-    rgb = _tensor_from_batch(batch["rgb"], "rgb").to(device)
-    robot_state = _tensor_from_batch(batch["robot_state"], "robot_state").to(
-        device=device, dtype=first_parameter.dtype
-    )
-    target = _tensor_from_batch(batch["action"], "action").to(
-        device=device, dtype=first_parameter.dtype
-    )
-    instruction = batch["instruction"]
-    if isinstance(instruction, str) or not isinstance(instruction, (Tensor, Sequence)):
-        raise TypeError("instruction must be a token tensor or a sequence of strings")
-    if isinstance(instruction, Tensor):
-        instruction = instruction.to(device)
-    mask_value = batch.get("action_mask")
-    mask = None if mask_value is None else _tensor_from_batch(mask_value, "action_mask").to(device)
-
     model.train()
     optimizer.zero_grad(set_to_none=True)
-    prediction = model(rgb=rgb, instruction=instruction, robot_state=robot_state)
-    if not isinstance(prediction, Tensor):
-        raise TypeError("model must return an action tensor")
+    prediction, target, mask = policy_forward_from_batch(
+        model,
+        batch,
+        device=device,
+        dtype=first_parameter.dtype,
+    )
     loss = action_imitation_loss(prediction, target, mask=mask, loss_kind=loss_kind)
     if not torch.isfinite(loss):
         raise FloatingPointError("supervised loss is not finite")

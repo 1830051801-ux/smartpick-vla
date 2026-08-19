@@ -21,6 +21,44 @@ class DomainRandomizationConfig:
     robot_state_noise_std: float = 0.002
     detection_noise_std_m: float = 0.004
     control_delay_steps: tuple[int, int] = (0, 3)
+    image_noise_std_px: float = 0.0
+    image_occlusion_probability: float = 0.0
+    image_occlusion_max_fraction: float = 0.0
+    vision_latency_frames: tuple[int, int] = (0, 0)
+
+    def __post_init__(self) -> None:
+        if (
+            self.object_mass_scale[0] <= 0.0
+            or self.object_mass_scale[0] > self.object_mass_scale[1]
+        ):
+            raise ValueError("object_mass_scale must be positive and ordered")
+        if self.friction_scale[0] <= 0.0 or self.friction_scale[0] > self.friction_scale[1]:
+            raise ValueError("friction_scale must be positive and ordered")
+        if (
+            self.light_intensity_scale[0] < 0.0
+            or self.light_intensity_scale[0] > self.light_intensity_scale[1]
+        ):
+            raise ValueError("light_intensity_scale must be non-negative and ordered")
+        if self.camera_position_std_m < 0.0 or self.camera_fovy_delta_deg < 0.0:
+            raise ValueError("camera randomization values must be non-negative")
+        if self.object_color_jitter < 0.0 or self.robot_state_noise_std < 0.0:
+            raise ValueError("state and color randomization values must be non-negative")
+        if self.detection_noise_std_m < 0.0 or self.image_noise_std_px < 0.0:
+            raise ValueError("detection and image noise values must be non-negative")
+        if not 0.0 <= self.image_occlusion_probability <= 1.0:
+            raise ValueError("image_occlusion_probability must be in [0, 1]")
+        if not 0.0 <= self.image_occlusion_max_fraction <= 1.0:
+            raise ValueError("image_occlusion_max_fraction must be in [0, 1]")
+        if (
+            self.control_delay_steps[0] < 0
+            or self.control_delay_steps[0] > self.control_delay_steps[1]
+        ):
+            raise ValueError("control_delay_steps must be non-negative and ordered")
+        if (
+            self.vision_latency_frames[0] < 0
+            or self.vision_latency_frames[0] > self.vision_latency_frames[1]
+        ):
+            raise ValueError("vision_latency_frames must be non-negative and ordered")
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> DomainRandomizationConfig:
@@ -32,6 +70,7 @@ class DomainRandomizationConfig:
             "friction_scale",
             "light_intensity_scale",
             "control_delay_steps",
+            "vision_latency_frames",
         )
         for name in tuple_fields:
             if name in normalized:
@@ -79,6 +118,10 @@ class DomainRandomizer:
                 "control_delay_steps": 0,
                 "robot_state_noise_std": 0.0,
                 "detection_noise_std_m": 0.0,
+                "image_noise_std_px": 0.0,
+                "image_occlusion_probability": 0.0,
+                "image_occlusion_max_fraction": 0.0,
+                "vision_latency_frames": 0,
             }
 
         cfg = self.config
@@ -106,6 +149,9 @@ class DomainRandomizer:
             )
 
         delay = int(rng.integers(cfg.control_delay_steps[0], cfg.control_delay_steps[1] + 1))
+        vision_latency = int(
+            rng.integers(cfg.vision_latency_frames[0], cfg.vision_latency_frames[1] + 1)
+        )
         return {
             "enabled": True,
             "mass_scales": mass_scales.round(6).tolist(),
@@ -116,5 +162,9 @@ class DomainRandomizer:
             "control_delay_steps": delay,
             "robot_state_noise_std": cfg.robot_state_noise_std,
             "detection_noise_std_m": cfg.detection_noise_std_m,
+            "image_noise_std_px": cfg.image_noise_std_px,
+            "image_occlusion_probability": cfg.image_occlusion_probability,
+            "image_occlusion_max_fraction": cfg.image_occlusion_max_fraction,
+            "vision_latency_frames": vision_latency,
             "config": asdict(cfg),
         }

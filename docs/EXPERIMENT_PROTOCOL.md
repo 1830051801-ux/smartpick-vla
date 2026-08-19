@@ -87,6 +87,50 @@ detection-noise, and/or delay shift. Record sampled parameters for every
 episode. If several perturbations are combined, also retain single-factor
 results when the budget permits.
 
+### Perception stress
+
+Uses nominal mechanics and task layout while injecting only declared camera
+corruption: image-space noise, partial black-box occlusion, and bounded visual
+latency. This suite isolates temporal observation handling and perception
+robustness from mass/friction changes. It is separate from the physics suite
+and must record sampled latency and image-corruption configuration in every
+episode artifact.
+
+## Completed six-axis vision release run
+
+The current release also contains a focused local benchmark for the visual
+closed-loop path. It is separate from the older five-axis learned-policy smoke
+table and from the privileged multi-object mission showcase.
+
+| Field | Recorded setting |
+|---|---|
+| Config | `configs/eval/vision_guided_six_axis.yaml` |
+| Checkpoint | `checkpoints/vision_six_axis_release_v2/best.pt` |
+| Dataset | `datasets/generated/vision_six_axis_release_v2.npz` |
+| Seeds | 901 through 915, 15 episode-level trials |
+| Language/layout | held-out paraphrase templates plus OOD layout |
+| Physics/sensing | declared camera, lighting, mass, friction, noise, delay, and latency ranges |
+| Grasp model | `grasp_assist=true` |
+| Hardware | none; `physical_hardware_execution=false` |
+
+The stored result is `results/vision_guided_six_axis_release_v2/summary.json`
+with its episode CSV as the source for aggregation:
+
+| Metric | Result |
+|---|---:|
+| Success | 15/15 (100%) |
+| Collision episodes | 0/15 |
+| Wrong pick / wrong bin / timeout | 0 / 0 / 0 |
+| Mean localization error | 12.213 mm |
+| P95 localization error | 18.222 mm |
+| Mean perception-to-action latency | 4.279 ms |
+| Task-selection accuracy | 100% |
+
+The success count is a local simulation result with a small sample size; it is
+not a production reliability estimate. Scene poses are used only after action
+selection for evaluator metrics. The contact-assisted grasp model and the
+simulated homography must remain in any reproduction or comparison.
+
 ## Seed policy
 
 Every run records:

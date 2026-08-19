@@ -24,6 +24,7 @@ The implementation is compact:
 ```mermaid
 flowchart LR
     E["MuJoCo/Gymnasium sorting task"] --> O["RGB + instruction + robot state"]
+    E --> P["Synthetic RGB-D, masks, boxes"]
     X["Waypoint + IK expert"] --> D["Episode demonstrations"]
     O --> BC["Single-step BC"]
     O --> VLA["Compact VLA action-chunk policy"]
@@ -33,6 +34,8 @@ flowchart LR
     B --> R["Bounded residual SAC"]
     R --> S["Bounded composition + environment/external safety checks"]
     S --> E
+    O --> F["Copied-state predictive safety filter"]
+    F --> S
     L["External robot logs"] --> P["Validated import + timed replay stream"]
     P --> A["Analysis or simulator adapter"]
     A --> E
@@ -41,8 +44,10 @@ flowchart LR
 
 ## Task and simulation
 
-The default scene uses a primitive-only five-axis arm, a parallel gripper,
-three workpieces, and three destination trays. The quality classes are:
+The default interface uses a primitive five-axis arm contract, a parallel
+gripper, three workpieces, and three destination trays. An optional sixth
+tool-roll joint exposes a six-axis simulator contract without breaking legacy
+five-axis data. The quality classes are:
 
 | Class | Intended destination | Task meaning |
 | --- | --- | --- |
@@ -50,8 +55,11 @@ three workpieces, and three destination trays. The quality classes are:
 | `scratch` | scratch/rework tray | visible surface defect |
 | `unknown` | inspection tray | decision deferred for manual inspection |
 
-Each episode chooses one target class and samples an instruction from a named
-split. The train, paraphrase, and OOD template sets are disjoint. Object pose,
+Each default episode chooses one target class and samples an instruction from a
+named split. `mission_length=2` or `3` selects a duplicate-free ordered class
+sequence; correct placement switches the active instruction to the next class
+while keeping prior parts in their trays. The train, paraphrase, and OOD
+template sets are disjoint. Object pose,
 mass, friction, camera pose/FOV, illumination, color nuisance, robot-state
 noise, detection-coordinate noise, and control delay can be randomized. The
 exact sampled values must be recorded in episode metadata.
@@ -61,11 +69,43 @@ the environment's grasp preconditions are met. Results produced with this
 contact-gated grasp assist must retain that setting in their configuration;
 they must not be described as an unassisted contact-physics benchmark.
 
+### Camera-clear six-axis reset
+
+The six-axis home keyframe is selected jointly with the top-camera viewpoint,
+not only for a visually convenient arm pose. A deterministic pose sweep checks
+initial target visibility, fixed-geometry contacts, and IK reachability over the
+release seed set. The release keyframe is
+`[1.5, -0.2, -1.8, -1.142, 0, 0]` radians for the six arm joints. It removes a
+known self-occlusion case in which the original home pose covered the target
+on seed 909. The regression test keeps this failure from silently returning.
+
+### Verified RGB-to-action path
+
+The release vision controller is intentionally decomposed into auditable
+stages:
+
+```text
+RGB frame
+  -> spatial heatmap localizer (class-conditioned grasp keypoints)
+  -> three-frame consistency gate
+  -> simulated nine-point homography (pixel -> base XY)
+  -> language task parser (accepted/scratch/unknown)
+  -> six-axis waypoint controller and damped IK
+  -> copied-state predictive safety filter
+  -> MuJoCo action step and evaluator metrics
+```
+
+The learned localizer consumes RGB only. Robot state, instruction, and the
+saved calibration are controller inputs; privileged object poses are withheld
+until the evaluator computes post-action error and success metrics. The
+`vision_six_axis_release_v2` checkpoint and its episode CSV are the current
+release evidence for this path.
+
 ## Observation contract
 
 The learning policies consume three modalities:
 
-1. `rgb`: a fixed camera image, stored as `uint8` and normalized inside the
+1. `rgb`: a fixed top camera image, stored as `uint8` and normalized inside the
    model.
 2. `instruction`: the unmodified natural-language command. Text is encoded as
    UTF-8 bytes so the smoke path has no external tokenizer or model download.
@@ -79,9 +119,20 @@ Privileged MuJoCo object and bin poses are available to the expert, reward, and
 metric code only. They must not be added to learned-policy inputs without
 declaring a distinct oracle ablation.
 
+`TemporalVLAPolicy` receives an additional episode-safe history view:
+`rgb_history [T,3,H,W]`, `robot_state_history [T,24 or 29]`, and boolean
+`history_mask [T]`. Missing oldest observations are zero-padded and masked, so
+a temporal window cannot leak frames from a previous episode.
+
+The perception-data generator is intentionally separate from the policy
+observation contract. It can render top, oblique, and wrist RGB-D views with
+MuJoCo instance masks, visible-pixel counts, and boxes. Those labels support
+detector/segmentation work and regression tests; they are not privileged inputs
+to the VLA policies.
+
 ## Action contract
 
-The canonical action has five ordered elements:
+The legacy canonical action has five ordered elements:
 
 ```text
 [dx, dy, dz, dyaw, gripper]
@@ -93,7 +144,10 @@ The canonical action has five ordered elements:
   them with configured per-step translation and yaw limits.
 - `gripper` is normalized to `[-1, 1]`, with the sign/open-close convention
   carried in schema metadata.
-- An action chunk has shape `[H, 5]`. `H=8` is the current Compact VLA default,
+- With `six_axis=true`, the simulator action is
+  `[dx, dy, dz, dyaw, droll, gripper]`, state is 29D, and action chunks have
+  shape `[H, 6]`. It is a separate checkpoint/data contract.
+- A legacy action chunk has shape `[H, 5]`. `H=8` is the current Compact VLA default,
   but the horizon is checkpoint metadata rather than a wire-format constant.
 
 The base policy and residual policy use the same order. Simulation composition
@@ -102,6 +156,19 @@ External physical-unit chunks instead pass through `SafetySupervisor`, which
 bounds the requested residual and rejects an unsafe final chunk rather than
 silently projecting it. Real-log ingestion rejects non-finite values, the wrong
 frame, and the wrong action dimension.
+
+### Predictive simulator safety filter
+
+For simulation-only studies, `PredictiveSafetyFilter` copies the current
+MuJoCo state, applies the environment's IK-derived position targets, and rolls
+the candidate action forward for a bounded number of control steps. It accepts
+full motion when no collision is predicted, otherwise tries geometrically
+smaller Cartesian/orientation deltas before emitting a no-motion fallback.
+The evaluation runner records its configuration and intervention report in
+episode metadata. This filter has no hardware transport and is not a safety
+certification. Its optional finger-to-table allowance exists only because the
+primitive contact-assisted grasp model can brush the tabletop during a nominal
+downward approach.
 
 ## IK expert and low-level control
 
@@ -114,9 +181,10 @@ environment home reset -> pre-grasp -> descend -> close -> lift -> transfer -> l
 For every Cartesian target, damped least-squares IK in the environment uses the
 MuJoCo site Jacobian, clips each iterative update, and clamps commanded joint
 targets to model limits.
-The expert emits the same five-dimensional task-space action used by learned
-policies. This makes expert, BC, and Compact VLA rollouts comparable at the
-environment boundary.
+The expert emits the active five- or six-dimensional task-space action used by
+learned policies. It resets its waypoint state when a multi-object mission
+switches tasks. This makes expert, BC, and Compact VLA rollouts comparable at
+the environment boundary.
 
 The expert is an upper-bound controller with privileged geometry, not a fair
 vision-only policy. Report it separately and retain unsuccessful demonstration
@@ -156,6 +224,15 @@ Training applies a padded future-action mask so samples near an episode boundary
 do not learn artificial zero actions. Inference executes the first action (or a
 documented short prefix) and replans. If temporal ensembling is enabled, its
 weighting and execution stride become part of the evaluation configuration.
+
+### Temporal VLA
+
+The temporal policy shares compact vision and UTF-8 language encoders with the
+single-frame model. It mean-pools each visual grid into one timestep token,
+adds a robot-state token and learned time embedding, then uses a Transformer
+encoder over the observation window. The action-query decoder attends to these
+temporal tokens plus current-language tokens. Evaluation preserves this history
+inside one episode and clears it at every reset.
 
 ## Bounded residual SAC
 
