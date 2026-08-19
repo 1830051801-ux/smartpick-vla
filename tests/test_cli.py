@@ -93,6 +93,16 @@ def test_synthetic_real_log_validate_and_replay(
     assert len(replayed["episodes"]) == 1  # type: ignore[arg-type]
 
 
+def test_xiaou_hardware_profile_command_is_read_only(capsys: pytest.CaptureFixture[str]) -> None:
+    profile = PROJECT_ROOT / "configs" / "real" / "xiaou_hardware_profile.yaml"
+    assert main(["xiaou-hardware-profile", "--profile", str(profile)]) == 0
+    report = _captured_json(capsys)
+    assert report["scope"] == "hardware baseline inspection only"
+    assert report["hardware_transport_opened"] is False
+    assert report["mechanical"]["joint_count"] == 6  # type: ignore[index]
+    assert report["execution"]["hardware_execution_enabled"] is False  # type: ignore[index]
+
+
 def test_yaml_loader_and_recursive_merge_are_strict(tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
     config_path.write_text("model:\n  width: 32\nseed: 7\n", encoding="utf-8")

@@ -4,13 +4,17 @@ import json
 from pathlib import Path
 
 import pytest
+import yaml
 
 from smartpick_vla.real import (
+    XIAOU_HARDWARE_PROFILE_SCHEMA,
+    XIAOU_JOINT_NAMES,
     XiaoUDetection,
     XiaoUGraspProfile,
     XiaoUHomography,
     build_xiaou_plan_preview,
     load_xiaou_grasp_profiles,
+    load_xiaou_hardware_profile,
     load_xiaou_homography,
     save_xiaou_plan_preview,
 )
@@ -113,3 +117,50 @@ def test_xiaou_loaders_accept_simulated_assets_and_reject_unmeasured_profiles(
     )
     with pytest.raises(ValueError, match="incomplete"):
         load_xiaou_grasp_profiles(incomplete)
+
+
+def test_xiaou_hardware_profile_is_six_axis_and_motion_disabled(tmp_path: Path) -> None:
+    root = Path(__file__).resolve().parents[1]
+    profile_path = root / "configs" / "real" / "xiaou_hardware_profile.yaml"
+    profile = load_xiaou_hardware_profile(profile_path)
+
+    assert profile.schema_version == XIAOU_HARDWARE_PROFILE_SCHEMA
+    assert profile.joint_count == 6
+    assert tuple(profile.joint_limit_map) == XIAOU_JOINT_NAMES
+    assert profile.link_lengths_mm == (156.0, 180.0, 180.0, 93.0, 106.0)
+    assert profile.trajectory_payload_bytes == 26
+    assert profile.trajectory_interpolation_period_ms == 10
+    assert profile.uart_baud == 115200
+    assert profile.can_bitrate_bps == 1000000
+    assert profile.real_motion_ready is False
+    assert profile.hardware_execution_enabled is False
+    assert "raw_can_uart_bytes" in profile.forbidden_low_level_outputs
+    assert profile.to_dict()["execution"]["real_motion_ready"] is False
+
+    invalid_payload = yaml.safe_load(profile_path.read_text(encoding="utf-8"))
+    assert isinstance(invalid_payload, dict)
+    invalid_payload["execution"]["hardware_execution_enabled"] = True
+    invalid_path = tmp_path / "invalid_hardware_profile.yaml"
+    invalid_path.write_text(yaml.safe_dump(invalid_payload, sort_keys=False), encoding="utf-8")
+    with pytest.raises(ValueError, match="cannot be enabled"):
+        load_xiaou_hardware_profile(invalid_path)
+
+    invalid_payload["execution"]["hardware_execution_enabled"] = False
+    invalid_payload["trajectory"]["payload_bytes"] = 25
+    invalid_path.write_text(yaml.safe_dump(invalid_payload, sort_keys=False), encoding="utf-8")
+    with pytest.raises(ValueError, match="payload"):
+        load_xiaou_hardware_profile(invalid_path)
+
+    invalid_payload = yaml.safe_load(profile_path.read_text(encoding="utf-8"))
+    assert isinstance(invalid_payload, dict)
+    invalid_payload["interfaces"]["pi_f407_uart"]["baud"] = 57600
+    invalid_path.write_text(yaml.safe_dump(invalid_payload, sort_keys=False), encoding="utf-8")
+    with pytest.raises(ValueError, match="UART baseline"):
+        load_xiaou_hardware_profile(invalid_path)
+
+    invalid_payload = yaml.safe_load(profile_path.read_text(encoding="utf-8"))
+    assert isinstance(invalid_payload, dict)
+    invalid_payload["trajectory"]["angle_unit"] = "rad"
+    invalid_path.write_text(yaml.safe_dump(invalid_payload, sort_keys=False), encoding="utf-8")
+    with pytest.raises(ValueError, match="trajectory encoding"):
+        load_xiaou_hardware_profile(invalid_path)

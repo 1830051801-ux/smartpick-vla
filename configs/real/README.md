@@ -10,3 +10,10 @@ limits, controller timing and camera-to-base transform with measured values.
 Changing only `dry_run` is insufficient: hardware publication also requires
 `hardware_enabled: true`, a ready controller, a fresh heartbeat and no active
 emergency stop.
+
+For the XiaoU-specific six-axis baseline, see
+[`xiaou_hardware_profile.yaml`](xiaou_hardware_profile.yaml) and
+[`docs/XIAOU_TECHNICAL_BASELINE.md`](../../docs/XIAOU_TECHNICAL_BASELINE.md).
+That profile is inspection-only: it records source-traced geometry and
+Pi/F407/CAN interface facts, but it cannot authorize hardware motion or replace
+measured calibration and firmware acceptance.

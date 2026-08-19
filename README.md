@@ -63,6 +63,9 @@ installs provide both `picksort` (preferred) and `smartpick` commands.
   evaluation metadata.
 - Versioned JSONL/CSV real-log import, calibration, replay/resampling, system
   parameter records, and ROS 2 preview/hardware gating.
+- Source-traced XiaoU six-axis hardware baseline covering CAD dimensions,
+  joint limits, Pi-F407 UART, F407-CAN, synchronized 26-byte trajectories, and
+  explicit readiness gates; profile inspection never opens hardware transport.
 - XiaoU camera-homography and grasp-profile adapter that emits an auditable
   six-axis `pregrasp → grasp → lift` planning preview; it has no CAN, serial,
   or hardware-execution path.
@@ -420,6 +423,19 @@ hardware:
 Actual XiaoU profiles with unknown heights are rejected deliberately. See
 [`docs/XIAOU_BRIDGE.md`](docs/XIAOU_BRIDGE.md).
 
+To inspect the supplied XiaoU technical baseline without opening serial, CAN,
+ROS, or a motor channel:
+
+```powershell
+.\.venv\Scripts\python.exe -m smartpick_vla xiaou-hardware-profile
+```
+
+The profile records six-axis geometry and the Pi/F407/CAN interface contract,
+but keeps `real_motion_ready: false`, `hardware_execution_enabled: false`, and
+`moveit_mode: review_only`. It does not contain guessed CAN IDs or unmeasured
+camera/TCP/grasp values. See
+[`docs/XIAOU_TECHNICAL_BASELINE.md`](docs/XIAOU_TECHNICAL_BASELINE.md).
+
 ## ROS 2 dry-run boundary
 
 The optional package is in `ros2_ws/src/smartpick_vla_ros2`. Its default is
@@ -450,7 +466,7 @@ src/smartpick_vla/
   envs/                          MuJoCo/Gymnasium task and camera stress
   evaluation/                    paired suites, metrics, plots, GIF evidence
   models/                        BC, Compact VLA, Temporal VLA, residual RL
-  real/                          logs, calibration, XiaoU preview, safety
+  real/                          logs, calibration, XiaoU baseline/preview, safety
   training/                      supervised and residual-SAC loops/checkpoints
 tests/                            unit and MuJoCo integration tests
 ```
@@ -503,6 +519,7 @@ The complete list is in [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md).
 - [`docs/MODEL_CARD.md`](docs/MODEL_CARD.md)
 - [`docs/REAL2SIM2REAL.md`](docs/REAL2SIM2REAL.md)
 - [`docs/XIAOU_BRIDGE.md`](docs/XIAOU_BRIDGE.md)
+- [`docs/XIAOU_TECHNICAL_BASELINE.md`](docs/XIAOU_TECHNICAL_BASELINE.md)
 - [`docs/ROS2_DRY_RUN.md`](docs/ROS2_DRY_RUN.md)
 - [`docs/RELEASE.md`](docs/RELEASE.md)
 

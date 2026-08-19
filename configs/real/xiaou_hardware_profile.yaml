@@ -1,0 +1,77 @@
+# XiaoU six-axis technical baseline derived from the user-supplied project note.
+# It is an auditable interface/profile record, not a live-driver configuration.
+# Do not infer CAN IDs, calibration values, grasp heights, or readiness from it.
+schema_version: picksort-xiaou-hardware-profile/v1
+
+source:
+  document: "小U具身智能桌面服务机器人_项目技术说明.pdf"
+  sha256: f1a776eb8d9d961dbe2d9a01f03bfc1268698b97de083ee2ca72aba8b29489b0
+
+mechanical:
+  joint_count: 6
+  # J1-J2, J2-J3, J3-J4, J4-J5, J5-J6. CAD/URDF offline geometry baseline only.
+  link_lengths_mm: [156.0, 180.0, 180.0, 93.0, 106.0]
+  tcp_axis_center_mm: 207.5
+  tcp_tip_mm: 239.9
+  # Software working ranges from the technical note; confirm against the current arm before motion.
+  joint_limits_deg:
+    J1: [-165.0, 165.0]
+    J2: [-125.0, 125.0]
+    J3: [-135.0, 135.0]
+    J4: [-175.0, 175.0]
+    J5: [-85.0, 115.0]
+    J6: [-175.0, 175.0]
+
+interfaces:
+  pi_f407_uart:
+    device: /dev/serial0
+    baud: 115200
+    data_bits: 8
+    parity: none
+    stop_bits: 1
+    logic_voltage_v: 3.3
+  f407_can:
+    transport: classic_can
+    bitrate_bps: 1000000
+    id_bits: 11
+    dlc: 8
+    # CAN IDs are intentionally absent from the technical note and must not be guessed.
+    id_policy: externally_versioned_not_declared_here
+
+trajectory:
+  # Little-endian 6 x float32 absolute joint angles plus uint16 duration_ms.
+  angle_encoding: little_endian_float32_x6
+  angle_semantics: absolute_joint_angle
+  angle_unit: deg
+  duration_encoding: little_endian_uint16
+  duration_unit: ms
+  payload_bytes: 26
+  interpolation_period_ms: 10
+  sync_field: duration_ms
+  admission_requirements:
+    - crc_valid
+    - sequence_valid
+    - fifo_free_slots
+    - feedback_fresh
+    - zero_valid
+    - joint_limits_valid
+    - stop_clear
+    - estop_clear
+
+software_boundary:
+  yolo_trained_classes: [pen, bottle, cola, earphone]
+  # The note explicitly says these are not in the current real training set.
+  yolo_untrained_classes: [cup, tissue]
+  # Transformer/VLA remains a task-level proposal layer.
+  decision_output_fields: [task_candidate, phase, action_parameters, risk]
+  forbidden_low_level_outputs: [joint_angles, pwm, raw_can_uart_bytes]
+  moveit_mode: review_only
+  ros2_dds_verified: false
+
+execution:
+  # These require a new hardware acceptance record; profile loading never enables motion.
+  real_motion_ready: false
+  hardware_execution_enabled: false
+  latest_firmware_validated: false
+  six_axis_feedback_validated: false
+  emergency_stop_validated: false

@@ -41,6 +41,7 @@ from smartpick_vla.real import (
     load_real_config,
     load_real_log,
     load_xiaou_grasp_profiles,
+    load_xiaou_hardware_profile,
     load_xiaou_homography,
     save_xiaou_plan_preview,
 )
@@ -461,6 +462,16 @@ def _command_xiaou_preview(args: argparse.Namespace) -> int:
     return 0
 
 
+def _command_xiaou_hardware_profile(args: argparse.Namespace) -> int:
+    """Inspect the versioned XiaoU baseline without opening a transport."""
+
+    payload = load_xiaou_hardware_profile(args.profile).to_dict()
+    payload["scope"] = "hardware baseline inspection only"
+    payload["hardware_transport_opened"] = False
+    _json_print(payload)
+    return 0
+
+
 def _command_report(args: argparse.Namespace) -> int:
     destination = Path(args.output)
     destination.mkdir(parents=True, exist_ok=True)
@@ -625,6 +636,15 @@ def build_parser() -> argparse.ArgumentParser:
     xiaou_preview.add_argument("--maximum-calibration-error-mm", type=float, default=2.0)
     xiaou_preview.add_argument("--output")
     xiaou_preview.set_defaults(handler=_command_xiaou_preview)
+
+    xiaou_hardware_profile = subparsers.add_parser(
+        "xiaou-hardware-profile",
+        help="inspect the XiaoU six-axis baseline without opening a hardware transport",
+    )
+    xiaou_hardware_profile.add_argument(
+        "--profile", default="configs/real/xiaou_hardware_profile.yaml"
+    )
+    xiaou_hardware_profile.set_defaults(handler=_command_xiaou_hardware_profile)
 
     report = subparsers.add_parser("report", help="regenerate plots from raw CSV files")
     report.add_argument("--training", action="append", default=[], metavar="NAME=HISTORY_CSV")

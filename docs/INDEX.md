@@ -19,6 +19,8 @@ Use these documents as the source of truth for the corresponding topic:
   and domain-randomization scope.
 - [XiaoU bridge](XIAOU_BRIDGE.md): camera homography to six-axis planning-only
   target previews and grasp-profile completeness checks.
+- [XiaoU technical baseline](XIAOU_TECHNICAL_BASELINE.md): source-traced six-axis
+  geometry, UART/CAN contracts, trajectory admission, and hardware-readiness gates.
 - [ROS 2 dry-run](ROS2_DRY_RUN.md): ROS interfaces, validation gates, and the
   deliberate separation from hardware execution.
 - [Limitations](LIMITATIONS.md): known scientific, simulation, language, and

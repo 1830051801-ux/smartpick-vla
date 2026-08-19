@@ -20,6 +20,22 @@ YOLO center (u, v, confidence)
 The output is a JSON preview. It does not connect to UART, CAN, a robot driver,
 or a MoveIt execution service.
 
+## Technical baseline
+
+[`configs/real/xiaou_hardware_profile.yaml`](../configs/real/xiaou_hardware_profile.yaml)
+records the user-provided six-axis mechanical dimensions, working limits,
+Pi-F407 UART contract, F407-CAN contract, 26-byte trajectory shape, and the
+software/hardware execution boundary. It can be inspected with:
+
+```powershell
+.\.venv\Scripts\python.exe -m smartpick_vla xiaou-hardware-profile
+```
+
+The command reads YAML only and reports `hardware_transport_opened: false`.
+It does not make the preview adapter a physical transport. The full provenance,
+evidence levels, generic-simulation boundary, and required acceptance gates are
+in [XiaoU technical baseline](XIAOU_TECHNICAL_BASELINE.md).
+
 ## Inputs and safety checks
 
 `picksort xiaou-preview` validates all of the following before producing a
@@ -33,9 +49,10 @@ target:
   `grasp_height_m < approach_height_m <= lift_height_m` values;
 - named source and `base_link` target frames.
 
-The current XiaoU hardware profile intentionally leaves several physical
-heights, gripper values, and placements as `null` until they are measured. The
-bridge rejects such incomplete profiles. It does not fill in guesses.
+The technical baseline intentionally does not populate physical camera
+calibration, grasp heights, gripper values, or placements until they are
+measured. The bridge rejects incomplete grasp profiles. It does not fill in
+guesses.
 
 ## Simulation-only example
 

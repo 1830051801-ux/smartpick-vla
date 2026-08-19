@@ -19,6 +19,19 @@ The implementation is compact:
 - Real-log replay and ROS 2 dry-run prepare a transfer boundary. They do not
   establish real-robot success.
 
+### XiaoU source-traced baseline
+
+The project also carries a separate XiaoU six-axis technical baseline in
+[`configs/real/xiaou_hardware_profile.yaml`](../configs/real/xiaou_hardware_profile.yaml).
+It records source-traced CAD dimensions, six working joint ranges, the Pi-F407
+UART and F407-CAN contracts, and a 26-byte synchronized trajectory payload.
+The profile is validated by the pure-Python `real.xiaou` module but is not wired
+to serial, CAN, ROS 2, or MuJoCo actuation. It explicitly retains
+`real_motion_ready: false`, `hardware_execution_enabled: false`, and
+`moveit_mode: review_only` until current hardware acceptance data exists. See
+[XiaoU technical baseline](XIAOU_TECHNICAL_BASELINE.md) for provenance and
+evidence boundaries.
+
 ## System flow
 
 ```mermaid

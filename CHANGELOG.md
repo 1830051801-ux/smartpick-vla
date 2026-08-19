@@ -31,11 +31,18 @@ intends to use semantic versioning after its first tagged release.
 - XiaoU pixel-homography to six-axis planning-preview adapter with complete
   grasp-profile validation, ROS 2-compatible pose previews, and no hardware
   transport path.
+- Source-traced XiaoU six-axis hardware profile with mechanical dimensions,
+  joint limits, Pi-F407 UART/CAN contracts, 26-byte synchronized trajectory
+  schema, software output boundary, read-only inspection CLI, and explicit
+  hardware-readiness gates.
 
 ### Safety
 
 - XiaoU profiles with unknown heights are rejected rather than given default
   numeric grasp values; all XiaoU output remains `planning_only=true`.
+- XiaoU hardware profile loading keeps `real_motion_ready=false` and
+  `hardware_execution_enabled=false`; it never opens serial, CAN, ROS, or a
+  motor transport.
 
 ## [0.1.1] - 2026-07-17
 
