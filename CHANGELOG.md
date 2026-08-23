@@ -8,6 +8,14 @@ intends to use semantic versioning after its first tagged release.
 
 ### Added
 
+- Public repository scope document and ignore rules for separating reproducible
+  source from local long-run datasets, checkpoints, logs and media.
+- Episode-safe multimodal world-model Transformer v2 with residual next-state
+  dynamics, learned state-uncertainty diagnostics, action-conditioned imagined
+  rollouts, and a documented six-axis training/evaluation contract.
+- ROS 2 `PredictiveRisk` fields for wrong-pick risk, state uncertainty, model
+  identity, and machine-readable risk reasons; the monitor now propagates the
+  complete action plan and can fail closed when predictive blocking is enabled.
 - Camera-clear six-axis home pose selected by fixed-seed visibility/collision
   checks, with a seed-909 top-camera visibility regression test.
 - Versioned `vision_six_axis_release_v2` synthetic perception dataset,

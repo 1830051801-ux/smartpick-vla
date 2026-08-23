@@ -1,0 +1,52 @@
+# Reproducible six-axis experiment matrix. This is a runnable configuration,
+# not a claim that the full budget has already been executed.
+tasks:
+  - task_id: single_sort
+    mission_length: 1
+    description: single-object language-conditioned sorting
+  - task_id: ordered_pair
+    mission_length: 2
+    description: two-object ordered sorting mission
+suites:
+  - id
+  - paraphrase
+  - ood
+  - physics
+  - perception
+seed_start: 72000
+episodes_per_task: 32
+workers: 2
+max_episode_steps: 200
+image_size: 96
+replan_interval: 2
+six_axis: true
+grasp_assist: true
+device: cpu
+retries: 1
+resume: true
+physics_randomization:
+  enabled: true
+  object_mass_scale: [0.50, 1.70]
+  friction_scale: [0.40, 1.80]
+  camera_position_std_m: 0.018
+  camera_fovy_delta_deg: 5.0
+  light_intensity_scale: [0.60, 1.40]
+  object_color_jitter: 0.15
+  robot_state_noise_std: 0.004
+  detection_noise_std_m: 0.008
+  control_delay_steps: [1, 3]
+perception_randomization:
+  enabled: true
+  object_mass_scale: [1.0, 1.0]
+  friction_scale: [1.0, 1.0]
+  camera_position_std_m: 0.0
+  camera_fovy_delta_deg: 0.0
+  light_intensity_scale: [1.0, 1.0]
+  object_color_jitter: 0.0
+  robot_state_noise_std: 0.0
+  detection_noise_std_m: 0.0
+  control_delay_steps: [0, 0]
+  image_noise_std_px: 14.0
+  image_occlusion_probability: 0.55
+  image_occlusion_max_fraction: 0.20
+  vision_latency_frames: [1, 3]

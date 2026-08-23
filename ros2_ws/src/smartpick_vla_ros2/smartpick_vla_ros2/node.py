@@ -9,9 +9,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Bool, Empty
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import Image
+from std_msgs.msg import Bool, Empty, String
 
 from smartpick_vla.real import (
     ActionAuditLogger,
@@ -31,6 +34,7 @@ from smartpick_vla.real import (
 from smartpick_vla_ros2.core import (
     ChunkPair,
     ChunkPairBuffer,
+    PredictiveRisk,
     seconds_to_stamp_parts,
     stamp_to_seconds,
 )
@@ -44,8 +48,12 @@ from smartpick_vla_ros2.msg import (
     ExecutionStatus as ExecutionStatusMsg,
 )
 from smartpick_vla_ros2.msg import (
+    PredictiveRisk as PredictiveRiskMsg,
+)
+from smartpick_vla_ros2.msg import (
     RobotState as RobotStateMsg,
 )
+from smartpick_vla_ros2.predictive import PredictiveRiskMonitor
 
 
 class SmartPickSafetyBridge(Node):
@@ -89,6 +97,18 @@ class SmartPickSafetyBridge(Node):
             ),
         )
         self.declare_parameter("status_topic", "/smartpick/execution_status")
+        self.declare_parameter("camera_topic", "/smartpick/camera/rgb")
+        self.declare_parameter("instruction_topic", "/smartpick/instruction")
+        self.declare_parameter("predictive_risk_topic", "/smartpick/predictive_risk")
+        self.declare_parameter("world_model_checkpoint", "")
+        self.declare_parameter("world_model_device", "cpu")
+        self.declare_parameter("world_model_horizon", 4)
+        self.declare_parameter("world_model_collision_threshold", 0.65)
+        self.declare_parameter("world_model_wrong_pick_threshold", 0.75)
+        self.declare_parameter("world_model_wrong_bin_threshold", 0.75)
+        self.declare_parameter("world_model_termination_threshold", 0.95)
+        self.declare_parameter("world_model_uncertainty_threshold", 0.75)
+        self.declare_parameter("predictive_risk_blocking", False)
         self.declare_parameter(
             "audit_jsonl",
             runtime.audit_jsonl if runtime is not None and runtime.audit_jsonl else "",
@@ -106,6 +126,35 @@ class SmartPickSafetyBridge(Node):
         self._controller_ready = False
         self._emergency_stop_active = False
         self._last_heartbeat_s: float | None = None
+        self._latest_rgb: np.ndarray | None = None
+        self._latest_instruction = ""
+        self._predictive_risk_blocking = bool(self.get_parameter("predictive_risk_blocking").value)
+        self._predictive_monitor: PredictiveRiskMonitor | None = None
+        checkpoint = str(self.get_parameter("world_model_checkpoint").value).strip()
+        if checkpoint:
+            try:
+                self._predictive_monitor = PredictiveRiskMonitor(
+                    checkpoint,
+                    device=str(self.get_parameter("world_model_device").value),
+                    horizon=int(self.get_parameter("world_model_horizon").value),
+                    collision_threshold=float(
+                        self.get_parameter("world_model_collision_threshold").value
+                    ),
+                    wrong_pick_threshold=float(
+                        self.get_parameter("world_model_wrong_pick_threshold").value
+                    ),
+                    wrong_bin_threshold=float(
+                        self.get_parameter("world_model_wrong_bin_threshold").value
+                    ),
+                    termination_threshold=float(
+                        self.get_parameter("world_model_termination_threshold").value
+                    ),
+                    uncertainty_threshold=float(
+                        self.get_parameter("world_model_uncertainty_threshold").value
+                    ),
+                )
+            except (OSError, RuntimeError, ValueError) as error:
+                self.get_logger().error(f"world-model monitor disabled: {error}")
 
         self._preview_publisher = self.create_publisher(
             ActionChunkMsg,
@@ -120,6 +169,11 @@ class SmartPickSafetyBridge(Node):
         self._status_publisher = self.create_publisher(
             ExecutionStatusMsg,
             str(self.get_parameter("status_topic").value),
+            10,
+        )
+        self._predictive_risk_publisher = self.create_publisher(
+            PredictiveRiskMsg,
+            str(self.get_parameter("predictive_risk_topic").value),
             10,
         )
         audit_path = str(self.get_parameter("audit_jsonl").value).strip()
@@ -168,6 +222,18 @@ class SmartPickSafetyBridge(Node):
             self._on_heartbeat,
             10,
         )
+        self.create_subscription(
+            Image,
+            str(self.get_parameter("camera_topic").value),
+            self._on_image,
+            qos_profile_sensor_data,
+        )
+        self.create_subscription(
+            String,
+            str(self.get_parameter("instruction_topic").value),
+            self._on_instruction,
+            10,
+        )
 
         self.get_logger().info(
             "PickSort safety bridge started: "
@@ -211,11 +277,28 @@ class SmartPickSafetyBridge(Node):
     def _on_heartbeat(self, _message: Empty) -> None:
         self._last_heartbeat_s = self._now_s()
 
+    def _on_instruction(self, message: String) -> None:
+        self._latest_instruction = str(message.data)
+
+    def _on_image(self, message: Image) -> None:
+        try:
+            self._latest_rgb = image_message_to_rgb(message)
+        except ValueError as error:
+            self._latest_rgb = None
+            self.get_logger().error(f"rejected camera image: {error}")
+
     def _process_pair(self, pair: ChunkPair) -> None:
         state = self._latest_state
         if state is None:
             self._publish_blocked(pair.base, "robot_state_missing")
             return
+        risk = self._predictive_risk(pair.base, state)
+        if risk is not None:
+            self._publish_predictive_risk(pair.base, risk)
+            if risk.blocked and self._predictive_risk_blocking:
+                reason = "+".join(risk.risk_reasons) or "predictive_risk_blocked"
+                self._publish_blocked(pair.base, f"predictive_risk:{reason}")
+                return
         now_s = self._now_s()
         result = self._pipeline.submit(
             pair.base,
@@ -229,6 +312,45 @@ class SmartPickSafetyBridge(Node):
             now_s=now_s,
         )
         self._publish_result(result, now_s=now_s)
+
+    def _predictive_risk(self, chunk: ActionChunk, state: RobotState) -> PredictiveRisk | None:
+        monitor = self._predictive_monitor
+        if monitor is None or self._latest_rgb is None:
+            if self._predictive_risk_blocking:
+                return PredictiveRisk(
+                    collision_probability=1.0 if monitor is None else 0.0,
+                    termination_probability=0.0,
+                    wrong_bin_probability=0.0,
+                    horizon=1,
+                    blocked=True,
+                    model_id="unavailable",
+                    risk_reasons=(
+                        "predictive_model_unavailable"
+                        if monitor is None
+                        else "camera_observation_unavailable",
+                    ),
+                )
+            return None
+        try:
+            return monitor.update(
+                self._latest_rgb,
+                self._latest_instruction or chunk.task_id,
+                state,
+                chunk,
+            )
+        except (RuntimeError, ValueError) as error:
+            self.get_logger().error(f"world-model prediction unavailable: {error}")
+            if self._predictive_risk_blocking:
+                return PredictiveRisk(
+                    collision_probability=1.0,
+                    termination_probability=0.0,
+                    wrong_bin_probability=0.0,
+                    horizon=1,
+                    blocked=True,
+                    model_id="unavailable",
+                    risk_reasons=("predictive_prediction_error",),
+                )
+            return None
 
     def _publish_preview(self, chunk: ActionChunk) -> None:
         self._preview_publisher.publish(action_chunk_to_message(chunk))
@@ -247,6 +369,23 @@ class SmartPickSafetyBridge(Node):
         message.reason_codes = [reason]
         message.detail = reason
         self._status_publisher.publish(message)
+
+    def _publish_predictive_risk(self, chunk: ActionChunk, risk: PredictiveRisk) -> None:
+        message = PredictiveRiskMsg()
+        _set_header(message.header, self._now_s(), chunk.frame_id)
+        message.task_id = chunk.task_id
+        message.sequence_id = chunk.sequence_id
+        message.model_id = risk.model_id
+        message.collision_probability = risk.collision_probability
+        message.termination_probability = risk.termination_probability
+        message.wrong_bin_probability = risk.wrong_bin_probability
+        message.wrong_pick_probability = risk.wrong_pick_probability
+        message.max_state_std = risk.max_state_std
+        message.horizon = risk.horizon
+        message.model_available = risk.model_id != "unavailable"
+        message.blocked = risk.blocked
+        message.risk_reasons = list(risk.risk_reasons)
+        self._predictive_risk_publisher.publish(message)
 
     def _publish_result(self, result: PipelineResult, *, now_s: float) -> None:
         message = ExecutionStatusMsg()
@@ -288,6 +427,39 @@ def action_chunk_from_message(message: ActionChunkMsg) -> ActionChunk:
         frame_id=str(message.header.frame_id),
         policy_id=str(message.policy_id),
     )
+
+
+def image_message_to_rgb(message: Image) -> np.ndarray:
+    """Decode common ROS image encodings without requiring cv_bridge."""
+
+    height = int(message.height)
+    width = int(message.width)
+    step = int(message.step)
+    encoding = str(message.encoding).lower()
+    if height < 1 or width < 1 or step < width:
+        raise ValueError("image dimensions or row step are invalid")
+    raw = np.asarray(message.data, dtype=np.uint8)
+    if raw.size < height * step:
+        raise ValueError("image buffer is shorter than height * step")
+    rows = raw[: height * step].reshape(height, step)
+    if encoding in {"rgb8", "bgr8"}:
+        row_width = width * 3
+        if step < row_width:
+            raise ValueError("three-channel image step is too small")
+        image = rows[:, :row_width].reshape(height, width, 3).copy()
+        if encoding == "bgr8":
+            image = image[..., ::-1].copy()
+        return image
+    if encoding == "rgba8":
+        row_width = width * 4
+        if step < row_width:
+            raise ValueError("RGBA image step is too small")
+        return rows[:, :row_width].reshape(height, width, 4)[..., :3].copy()
+    if encoding == "mono8":
+        if step < width:
+            raise ValueError("mono image step is too small")
+        return np.repeat(rows[:, :width, None], 3, axis=2)
+    raise ValueError(f"unsupported image encoding {message.encoding!r}")
 
 
 def robot_state_from_message(message: RobotStateMsg) -> RobotState:

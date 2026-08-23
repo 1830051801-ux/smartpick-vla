@@ -219,5 +219,18 @@ def test_ros_core_imports_without_rclpy_and_pairs_chunks() -> None:
         assert pair.base is base and pair.residual is residual
         assert core.seconds_to_stamp_parts(1.9999999996) == (2, 0)
         assert core.stamp_to_seconds(2, 500_000_000) == 2.5
+        risk = core.PredictiveRisk(
+            0.2,
+            0.1,
+            0.3,
+            4,
+            False,
+            model_id="wm@abc",
+            wrong_pick_probability=0.4,
+            max_state_std=0.12,
+            risk_reasons=("state_uncertainty",),
+        )
+        assert risk.to_dict()["model_id"] == "wm@abc"
+        assert risk.to_dict()["risk_reasons"] == ["state_uncertainty"]
     finally:
         sys.path.remove(str(package_source))

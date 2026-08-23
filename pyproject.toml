@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling>=1.27"]
+requires = ["hatchling>=1.27,<1.32"]
 build-backend = "hatchling.build"
 
 [project]
@@ -52,6 +52,10 @@ dev = [
   "types-PyYAML>=6.0,<7",
 ]
 ros2 = []
+onnx = [
+  "onnx>=1.16,<2",
+  "onnxruntime>=1.18,<2",
+]
 
 [project.scripts]
 picksort = "smartpick_vla.cli:main"

@@ -57,6 +57,12 @@ def generate_expert_dataset(
         "rgb": [],
         "robot_state": [],
         "action": [],
+        "reward": [],
+        "terminated": [],
+        "truncated": [],
+        "collision": [],
+        "wrong_pick": [],
+        "wrong_bin": [],
         "episode_id": [],
         "step_index": [],
         "instruction": [],
@@ -79,12 +85,28 @@ def generate_expert_dataset(
                 buffer["rgb"].append(observation["rgb"])
                 buffer["robot_state"].append(observation["robot_state"])
                 buffer["action"].append(action)
+                # Terminal labels are filled from the post-action info below.
+                # Keeping them aligned with the action makes the archive usable
+                # for one-step dynamics/world-model training without replaying
+                # the simulator during dataset loading.
+                buffer["reward"].append(0.0)
+                buffer["terminated"].append(False)
+                buffer["truncated"].append(False)
+                buffer["collision"].append(False)
+                buffer["wrong_pick"].append(False)
+                buffer["wrong_bin"].append(False)
                 buffer["episode_id"].append(episode_id)
                 buffer["step_index"].append(step_index)
                 buffer["instruction"].append(observation["instruction"])
                 buffer["task_class"].append(env.task.target_class)
                 buffer["episode_success"].append(False)  # filled after terminal state
                 observation, reward, terminated, truncated, info = env.step(action)
+                buffer["reward"][-1] = float(reward)
+                buffer["terminated"][-1] = bool(terminated)
+                buffer["truncated"][-1] = bool(truncated)
+                buffer["collision"][-1] = bool(info.get("collision", False))
+                buffer["wrong_pick"][-1] = bool(info.get("wrong_pick", False))
+                buffer["wrong_bin"][-1] = bool(info.get("wrong_bin", False))
                 episode_return += reward
                 if terminated or truncated:
                     break
@@ -116,6 +138,12 @@ def generate_expert_dataset(
         "rgb": np.asarray(records["rgb"], dtype=np.uint8),
         "robot_state": np.asarray(records["robot_state"], dtype=np.float32),
         "action": np.asarray(records["action"], dtype=np.float32),
+        "reward": np.asarray(records["reward"], dtype=np.float32),
+        "terminated": np.asarray(records["terminated"], dtype=np.bool_),
+        "truncated": np.asarray(records["truncated"], dtype=np.bool_),
+        "collision": np.asarray(records["collision"], dtype=np.bool_),
+        "wrong_pick": np.asarray(records["wrong_pick"], dtype=np.bool_),
+        "wrong_bin": np.asarray(records["wrong_bin"], dtype=np.bool_),
         "episode_id": np.asarray(records["episode_id"], dtype=np.int32),
         "step_index": np.asarray(records["step_index"], dtype=np.int32),
         "instruction": np.asarray(records["instruction"], dtype=np.str_),

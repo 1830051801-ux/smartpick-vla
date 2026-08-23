@@ -9,6 +9,7 @@ __pycache__/
 htmlcov/
 dist/
 build/
+build-check/
 .idea/
 .vscode/
 Thumbs.db
@@ -21,4 +22,17 @@ checkpoints/*.pth
 checkpoints/**/last.pt
 !checkpoints/smoke/residual/last.pt
 results/runs/
+# Long-running local studies are intentionally kept out of ordinary source
+# commits. Select a complete evidence bundle explicitly after provenance review.
+results/industrial_*/
+results/learning/
+results/upgrade_*/
+results/vision_*/
+results/vision_diagnostics/
+datasets/generated/upgrade_*/
+datasets/generated/vision_*/
+checkpoints/upgrade_*/
+checkpoints/vision_*/
+outputs/*.onnx
+outputs/*.json
 *.mp4

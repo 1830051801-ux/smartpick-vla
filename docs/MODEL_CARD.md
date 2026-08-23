@@ -10,6 +10,12 @@ PickSort-VLA defines three learned policy families:
 | Compact VLA | normalized action chunk `[H,5]` | RGB-language-state chunk policy |
 | Residual SAC | bounded 5D correction | correction to a frozen Compact VLA base |
 
+The repository also contains a separate predictive model:
+
+| Variant | Output | Role |
+| --- | --- | --- |
+| World-model Transformer v2 | next 29D state, reward, event risks, state std | offline dynamics and ROS 2 risk preview |
+
 This card describes the architecture and reporting contract. It does not claim
 that a particular checkpoint has been trained or achieved a particular score.
 Every distributed checkpoint requires its own metadata and evaluation summary.
@@ -73,6 +79,16 @@ adapters convert to or store physical metres/radians with `frame_id=base_link`.
 Compact VLA predicts a configurable horizon, currently eight by default. A
 residual checkpoint is incomplete without the exact base checkpoint and
 per-dimension residual-scale vector.
+
+### World-model Transformer
+
+The six-axis world model consumes RGB, language, a 29D robot-state history, a
+6D action history, and an optional planned 6D action. It predicts a residual
+from the last valid state, five event-risk logits, reward, and a positive
+per-state standard-deviation diagnostic. Its imagined rollout can evaluate a
+candidate action sequence, but holds the latest image because it has no learned
+pixel renderer. See [`WORLD_MODEL.md`](WORLD_MODEL.md) for the exact contract,
+smoke evidence, and ROS 2 adapter limits.
 
 ## Architecture
 

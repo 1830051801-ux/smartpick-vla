@@ -1,0 +1,50 @@
+# Small deterministic matrix for local verification. Increase
+# episodes_per_task/workers for the full industrial study.
+tasks:
+  - task_id: single_sort
+    mission_length: 1
+    description: single-object language-conditioned sorting
+  - task_id: ordered_pair
+    mission_length: 2
+    description: ordered two-object sorting mission
+suites:
+  - id
+  - physics
+  - perception
+seed_start: 82000
+episodes_per_task: 2
+workers: 1
+max_episode_steps: 160
+image_size: 64
+replan_interval: 2
+six_axis: true
+grasp_assist: true
+device: cpu
+retries: 1
+resume: true
+physics_randomization:
+  enabled: true
+  object_mass_scale: [0.70, 1.35]
+  friction_scale: [0.60, 1.50]
+  camera_position_std_m: 0.010
+  camera_fovy_delta_deg: 3.0
+  light_intensity_scale: [0.75, 1.25]
+  object_color_jitter: 0.10
+  robot_state_noise_std: 0.002
+  detection_noise_std_m: 0.004
+  control_delay_steps: [0, 2]
+perception_randomization:
+  enabled: true
+  object_mass_scale: [1.0, 1.0]
+  friction_scale: [1.0, 1.0]
+  camera_position_std_m: 0.0
+  camera_fovy_delta_deg: 0.0
+  light_intensity_scale: [1.0, 1.0]
+  object_color_jitter: 0.0
+  robot_state_noise_std: 0.0
+  detection_noise_std_m: 0.0
+  control_delay_steps: [0, 0]
+  image_noise_std_px: 8.0
+  image_occlusion_probability: 0.25
+  image_occlusion_max_fraction: 0.12
+  vision_latency_frames: [0, 2]

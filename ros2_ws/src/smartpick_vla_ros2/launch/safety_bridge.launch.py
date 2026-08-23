@@ -11,11 +11,15 @@ def generate_launch_description() -> LaunchDescription:
     config_path = LaunchConfiguration("config_path")
     dry_run = LaunchConfiguration("dry_run")
     hardware_enabled = LaunchConfiguration("hardware_enabled")
+    world_model_checkpoint = LaunchConfiguration("world_model_checkpoint")
+    predictive_risk_blocking = LaunchConfiguration("predictive_risk_blocking")
     return LaunchDescription(
         [
             DeclareLaunchArgument("config_path", default_value=""),
             DeclareLaunchArgument("dry_run", default_value="true"),
             DeclareLaunchArgument("hardware_enabled", default_value="false"),
+            DeclareLaunchArgument("world_model_checkpoint", default_value=""),
+            DeclareLaunchArgument("predictive_risk_blocking", default_value="false"),
             Node(
                 package="smartpick_vla_ros2",
                 executable="smartpick_vla_safety_bridge",
@@ -27,6 +31,11 @@ def generate_launch_description() -> LaunchDescription:
                         "dry_run": ParameterValue(dry_run, value_type=bool),
                         "hardware_enabled": ParameterValue(
                             hardware_enabled,
+                            value_type=bool,
+                        ),
+                        "world_model_checkpoint": world_model_checkpoint,
+                        "predictive_risk_blocking": ParameterValue(
+                            predictive_risk_blocking,
                             value_type=bool,
                         ),
                     }

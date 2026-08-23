@@ -103,6 +103,15 @@ def test_xiaou_hardware_profile_command_is_read_only(capsys: pytest.CaptureFixtu
     assert report["execution"]["hardware_execution_enabled"] is False  # type: ignore[index]
 
 
+def test_new_simulation_commands_are_exposed() -> None:
+    from smartpick_vla.cli import build_parser
+
+    parser = build_parser()
+    commands = parser._subparsers._group_actions[0].choices
+    assert "industrial-evaluate" in commands
+    assert "export-vision-onnx" in commands
+
+
 def test_yaml_loader_and_recursive_merge_are_strict(tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
     config_path.write_text("model:\n  width: 32\nseed: 7\n", encoding="utf-8")

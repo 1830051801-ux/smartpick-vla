@@ -37,6 +37,8 @@ The package defines these messages:
 - `RobotState`: state, timestamp, and frame information used by the preview
   gate;
 - `ExecutionStatus`: accepted/rejected status and reason codes.
+- `PredictiveRisk`: optional world-model probabilities, uncertainty, model
+  identity, and risk reasons.
 
 The canonical order is:
 
@@ -64,12 +66,43 @@ message does not carry a separate schema-version field.
 | input | `/smartpick/controller_ready` | `std_msgs/Bool` | controller-ready interlock |
 | input | `/smartpick/emergency_stop` | `std_msgs/Bool` | emergency-stop interlock |
 | input | `/smartpick/controller_heartbeat` | `std_msgs/Empty` | liveness gate |
+| input | `/smartpick/camera/rgb` | `sensor_msgs/Image` | latest RGB frame for predictive preview |
+| input | `/smartpick/instruction` | `std_msgs/String` | latest language task for predictive preview |
 | output | `/smartpick/action_preview` | `ActionChunk` | composed action before authorization |
 | gated output | `/smartpick/safe_action_chunk` | `ActionChunk` | hardware-mode output only after all gates; silent in default dry-run |
 | output | `/smartpick/execution_status` | `ExecutionStatus` | decision and rejection reason |
+| output | `/smartpick/predictive_risk` | `PredictiveRisk` | imagined rollout risk preview |
 
 Topic names are launch parameters in deployments, but remapping must preserve
 the dry-run separation from motor topics.
+
+## Predictive world-model preview
+
+Set `world_model_checkpoint` to a trusted six-axis checkpoint to enable the
+optional monitor. It maintains an episode-bounded RGB/state/action history and
+passes the complete incoming action chunk as the imagined action plan. Since
+the legacy ROS action message has five channels, the adapter inserts
+`droll=0` before `gripper` for the six-channel world-model contract.
+
+The monitor publishes collision, termination, wrong-pick, wrong-bin, maximum
+state standard deviation, model hash, and a list of risk reasons. The default
+`predictive_risk_blocking=false` makes this advisory. When set to `true`, the
+bridge fails closed if the model is unavailable, the camera has not produced a
+valid frame, or a prediction exceeds any configured risk/uncertainty threshold.
+This is an additional software gate, not a certified safety controller.
+
+Example preview launch:
+
+```bash
+ros2 launch smartpick_vla_ros2 safety_bridge.launch.py \
+  world_model_checkpoint:=/path/to/world_model_six_axis_smoke_v2/best.pt \
+  predictive_risk_blocking:=false
+```
+
+The current `RobotState` interface lacks joint velocities and wrist-roll
+feedback. The adapter fills those fields with explicit zeros and therefore
+keeps this path preview-only until a versioned feedback interface and measured
+time/calibration contract are validated.
 
 ## Composition
 

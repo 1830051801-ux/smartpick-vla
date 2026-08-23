@@ -17,15 +17,21 @@ import numpy as np
 import torch
 
 from smartpick_vla import __version__
+from smartpick_vla.data.audit import audit_perception_dataset
 from smartpick_vla.data.expert import IKWaypointExpert
 from smartpick_vla.data.generate import GenerationConfig, generate_expert_dataset
 from smartpick_vla.data.perception import (
     PerceptionGenerationConfig,
     generate_synthetic_perception_dataset,
 )
+from smartpick_vla.deployment.vision_onnx import export_vision_localizer_onnx
 from smartpick_vla.envs import SmartPickEnv
 from smartpick_vla.envs.randomization import DomainRandomizationConfig
 from smartpick_vla.evaluation.benchmark import BenchmarkConfig, run_benchmark
+from smartpick_vla.evaluation.industrial import (
+    IndustrialExperimentConfig,
+    run_industrial_from_checkpoints,
+)
 from smartpick_vla.evaluation.plots import plot_grouped_evaluation, plot_learning_curves
 from smartpick_vla.evaluation.residual_controller import ResidualPolicyController
 from smartpick_vla.evaluation.safety_filter import PredictiveSafetyFilterConfig
@@ -52,6 +58,11 @@ from smartpick_vla.training.imitation import (
 )
 from smartpick_vla.training.online_residual import ResidualOnlineConfig, train_residual_online
 from smartpick_vla.training.vision import VisionTrainingConfig, train_vision_localizer
+from smartpick_vla.training.world_model import (
+    WorldModelTrainingConfig,
+    evaluate_world_model,
+    train_world_model,
+)
 from smartpick_vla.utils.config import load_config
 
 
@@ -207,6 +218,74 @@ def _command_train(args: argparse.Namespace) -> int:
             "trainable_parameters": manifest["trainable_parameters"],
             "global_steps": manifest["global_steps"],
             "best_validation_loss": manifest["best_validation_loss"],
+        }
+    )
+    return 0
+
+
+def _command_audit_perception(args: argparse.Namespace) -> int:
+    report = audit_perception_dataset(
+        args.dataset,
+        output_path=args.output,
+        require_depth=args.require_depth,
+        max_duplicate_fraction=args.max_duplicate_fraction,
+        split_seed=args.split_seed,
+    )
+    _json_print(
+        {
+            "dataset": str(Path(args.dataset)),
+            "samples": report["archive"]["samples"],
+            "episodes": report["episodes"]["count"],
+            "quality_gate": report["quality_gate"],
+            "report": str(Path(args.output)) if args.output else None,
+        }
+    )
+    return 0 if report["quality_gate"]["passed"] else 2
+
+
+def _command_train_world_model(args: argparse.Namespace) -> int:
+    payload = load_config(args.config)
+    training = WorldModelTrainingConfig(**payload["training"])
+    manifest = train_world_model(
+        args.dataset,
+        args.output,
+        training_config=training,
+        model_options=payload.get("model"),
+    )
+    _json_print(
+        {
+            "output": str(Path(args.output)),
+            "model": "world_model_transformer",
+            "best_validation_next_state_rmse": manifest["best_validation_next_state_rmse"],
+            "best_validation_mean_state_std": manifest["best_validation_mean_state_std"],
+            "best_validation_state_coverage_2sigma": manifest[
+                "best_validation_state_coverage_2sigma"
+            ],
+            "best_epoch": manifest["best_epoch"],
+            "total_parameters": manifest["total_parameters"],
+            "training_episodes": manifest["training_episodes"],
+            "validation_episodes": manifest["validation_episodes"],
+        }
+    )
+    return 0
+
+
+def _command_evaluate_world_model(args: argparse.Namespace) -> int:
+    report = evaluate_world_model(
+        args.checkpoint,
+        args.dataset,
+        args.output,
+        device=args.device,
+        batch_size=args.batch_size,
+    )
+    _json_print(
+        {
+            "checkpoint": str(Path(args.checkpoint)),
+            "dataset": str(Path(args.dataset)),
+            "samples": report["samples"],
+            "metrics": report["metrics"],
+            "report": str(Path(args.output)) if args.output else None,
+            "physical_robot_execution": False,
         }
     )
     return 0
@@ -380,6 +459,55 @@ def _command_evaluate_vision(args: argparse.Namespace) -> int:
             "media": summary["artifacts"]["gifs"],
         }
     )
+    return 0
+
+
+def _command_industrial_evaluate(args: argparse.Namespace) -> int:
+    payload = load_config(args.config)
+    config = IndustrialExperimentConfig.from_mapping(payload)
+    methods: dict[str, str | Path | None] = {}
+    for value in args.method:
+        if "=" not in value:
+            raise ValueError("--method must use NAME=CHECKPOINT syntax")
+        name, checkpoint = value.split("=", 1)
+        if not name or not checkpoint or name in methods or name == "ik_expert":
+            raise ValueError("invalid or duplicate --method specification")
+        methods[name] = checkpoint
+    if args.include_expert:
+        if "ik_expert" in methods:
+            raise ValueError("ik_expert must be specified only with --include-expert")
+        methods["ik_expert"] = None
+    if not methods:
+        raise ValueError("provide at least one --method or --include-expert")
+    run = run_industrial_from_checkpoints(args.output, methods, config=config)
+    _json_print(
+        {
+            "output": str(Path(args.output)),
+            "schema_version": "smartpick-industrial/v1",
+            "manifest_rows": len(run.manifest),
+            "episode_rows": len(run.results),
+            "resumed_rows": run.resumed_rows,
+            "executed_rows": run.executed_rows,
+            "worker_failures": list(run.worker_failures),
+            "episode_csv": str(run.episode_csv),
+            "summary_json": str(run.summary_json),
+            "manifest_json": str(run.manifest_json),
+            "simulation_only": True,
+        }
+    )
+    return 0
+
+
+def _command_export_vision_onnx(args: argparse.Namespace) -> int:
+    manifest = export_vision_localizer_onnx(
+        args.checkpoint,
+        args.output,
+        image_size=args.image_size,
+        opset_version=args.opset,
+        device=args.device,
+        verify=not args.skip_verify,
+    )
+    _json_print(manifest)
     return 0
 
 
@@ -564,6 +692,37 @@ def build_parser() -> argparse.ArgumentParser:
     train.add_argument("--init-checkpoint")
     train.set_defaults(handler=_command_train)
 
+    audit_perception = subparsers.add_parser(
+        "audit-perception",
+        help="audit synthetic RGB/RGB-D labels and episode split quality",
+    )
+    audit_perception.add_argument("--dataset", required=True)
+    audit_perception.add_argument("--output")
+    audit_perception.add_argument("--require-depth", action="store_true")
+    audit_perception.add_argument("--max-duplicate-fraction", type=float, default=0.20)
+    audit_perception.add_argument("--split-seed", type=int, default=20260822)
+    audit_perception.set_defaults(handler=_command_audit_perception)
+
+    world_model = subparsers.add_parser(
+        "train-world-model",
+        help="train a multimodal residual-dynamics Transformer world model",
+    )
+    world_model.add_argument("--config", required=True)
+    world_model.add_argument("--dataset", required=True)
+    world_model.add_argument("--output", required=True)
+    world_model.set_defaults(handler=_command_train_world_model)
+
+    evaluate_world = subparsers.add_parser(
+        "evaluate-world-model",
+        help="evaluate one-step dynamics, uncertainty, and event-risk heads",
+    )
+    evaluate_world.add_argument("--checkpoint", required=True)
+    evaluate_world.add_argument("--dataset", required=True)
+    evaluate_world.add_argument("--output")
+    evaluate_world.add_argument("--device", default="cpu")
+    evaluate_world.add_argument("--batch-size", type=int, default=32)
+    evaluate_world.set_defaults(handler=_command_evaluate_world_model)
+
     residual = subparsers.add_parser(
         "train-residual", help="train bounded residual SAC around a frozen VLA"
     )
@@ -597,6 +756,28 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate_vision.add_argument("--checkpoint", required=True)
     evaluate_vision.add_argument("--output", required=True)
     evaluate_vision.set_defaults(handler=_command_evaluate_vision)
+
+    industrial = subparsers.add_parser(
+        "industrial-evaluate",
+        help="run a resumable multi-task six-axis simulation experiment",
+    )
+    industrial.add_argument("--config", required=True)
+    industrial.add_argument("--method", action="append", default=[], metavar="NAME=CHECKPOINT")
+    industrial.add_argument("--include-expert", action="store_true")
+    industrial.add_argument("--output", required=True)
+    industrial.set_defaults(handler=_command_industrial_evaluate)
+
+    export_onnx = subparsers.add_parser(
+        "export-vision-onnx",
+        help="export and verify a six-axis RGB localizer with ONNX Runtime",
+    )
+    export_onnx.add_argument("--checkpoint", required=True)
+    export_onnx.add_argument("--output", required=True)
+    export_onnx.add_argument("--image-size", type=int)
+    export_onnx.add_argument("--opset", type=int, default=17)
+    export_onnx.add_argument("--device", default="cpu")
+    export_onnx.add_argument("--skip-verify", action="store_true")
+    export_onnx.set_defaults(handler=_command_export_vision_onnx)
 
     demo = subparsers.add_parser("demo-expert", help="render a fixed-seed IK expert GIF")
     demo.add_argument("--output", required=True)
