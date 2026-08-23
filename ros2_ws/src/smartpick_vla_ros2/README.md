@@ -10,6 +10,18 @@ The default launch values are `dry_run:=true` and
 heartbeat, a released emergency stop, fresh robot feedback, and a final action
 chunk that passes the Python safety supervisor.
 
+An optional six-axis world-model Transformer can be attached by setting
+`world_model_checkpoint`. It publishes predictive risk on
+`/smartpick/predictive_risk`; the preview includes collision, task-outcome,
+uncertainty, model-hash, and risk-reason fields. The complete incoming action
+chunk is used for the imagined plan. The legacy five-channel ROS action is
+adapted to the six-axis model by inserting `droll=0` before `gripper`.
+
+`predictive_risk_blocking` defaults to `false` and is advisory. When enabled,
+missing model/camera input and prediction errors fail closed in addition to the
+existing deterministic safety gates. This does not make the package a
+certified controller.
+
 The ROS environment must also be able to import the `smartpick-vla` Python
 package from this repository. Build and run from a ROS 2 shell:
 

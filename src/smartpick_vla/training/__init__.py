@@ -23,6 +23,14 @@ from smartpick_vla.training.vision import (
     localization_loss,
     train_vision_localizer,
 )
+from smartpick_vla.training.world_model import (
+    WorldModelSequenceDataset,
+    WorldModelTrainingConfig,
+    evaluate_world_model,
+    load_world_model,
+    train_world_model,
+    world_model_loss,
+)
 
 __all__ = [
     "CheckpointInfo",
@@ -32,13 +40,19 @@ __all__ = [
     "ResidualSACConfig",
     "SupervisedStepResult",
     "VisionTrainingConfig",
+    "WorldModelSequenceDataset",
+    "WorldModelTrainingConfig",
     "action_imitation_loss",
+    "evaluate_world_model",
     "load_checkpoint",
     "load_trained_policy",
     "load_vision_localizer",
+    "load_world_model",
     "localization_loss",
     "save_checkpoint",
     "supervised_train_step",
     "train_imitation",
     "train_vision_localizer",
+    "train_world_model",
+    "world_model_loss",
 ]

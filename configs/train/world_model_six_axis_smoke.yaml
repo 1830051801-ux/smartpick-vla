@@ -1,0 +1,31 @@
+# Compact multimodal latent-dynamics Transformer smoke configuration.
+# It predicts one next proprioceptive state and event risks; it is not a
+# pixel-generative foundation model or a physical-robot performance claim.
+training:
+  epochs: 2
+  batch_size: 16
+  learning_rate: 0.0003
+  weight_decay: 0.00001
+  validation_fraction: 0.34
+  seed: 9801
+  device: cpu
+  num_workers: 0
+  gradient_clip_norm: 1.0
+  state_loss_weight: 1.0
+  reward_loss_weight: 0.25
+  event_loss_weight: 0.25
+  uncertainty_loss_weight: 0.10
+
+model:
+  robot_state_dim: 29
+  action_dim: 6
+  observation_horizon: 4
+  d_model: 64
+  nhead: 4
+  temporal_layers: 2
+  language_layers: 1
+  feedforward_dim: 128
+  language_max_length: 64
+  vision_grid_size: 3
+  dropout: 0.0
+  min_state_std: 0.02

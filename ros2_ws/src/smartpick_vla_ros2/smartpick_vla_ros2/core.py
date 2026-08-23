@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass
 from math import isfinite
+from typing import Any
 
 from smartpick_vla.real.types import ActionChunk
 
@@ -15,6 +16,52 @@ ChunkKey = tuple[str, int]
 class ChunkPair:
     base: ActionChunk
     residual: ActionChunk
+
+
+@dataclass(frozen=True, slots=True)
+class PredictiveRisk:
+    """ROS-independent world-model risk result for a dry-run preview."""
+
+    collision_probability: float
+    termination_probability: float
+    wrong_bin_probability: float
+    horizon: int
+    blocked: bool
+    model_id: str = "unavailable"
+    wrong_pick_probability: float = 0.0
+    max_state_std: float = 0.0
+    risk_reasons: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        probabilities = (
+            self.collision_probability,
+            self.termination_probability,
+            self.wrong_bin_probability,
+            self.wrong_pick_probability,
+        )
+        if any(not isfinite(value) or not 0.0 <= value <= 1.0 for value in probabilities):
+            raise ValueError("predictive probabilities must be finite and in [0,1]")
+        if self.horizon < 1:
+            raise ValueError("predictive horizon must be positive")
+        if not self.model_id.strip():
+            raise ValueError("model_id must not be empty")
+        if not isfinite(self.max_state_std) or self.max_state_std < 0.0:
+            raise ValueError("max_state_std must be finite and non-negative")
+        if any(not reason.strip() for reason in self.risk_reasons):
+            raise ValueError("risk_reasons must contain non-empty strings")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "collision_probability": self.collision_probability,
+            "termination_probability": self.termination_probability,
+            "wrong_bin_probability": self.wrong_bin_probability,
+            "wrong_pick_probability": self.wrong_pick_probability,
+            "max_state_std": self.max_state_std,
+            "risk_reasons": list(self.risk_reasons),
+            "horizon": self.horizon,
+            "blocked": self.blocked,
+            "model_id": self.model_id,
+        }
 
 
 class ChunkPairBuffer:

@@ -4,3 +4,4 @@
 *.gif binary
 *.pt binary
 *.npz binary
+*.onnx binary

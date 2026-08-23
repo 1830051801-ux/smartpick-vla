@@ -13,6 +13,9 @@ Use these documents as the source of truth for the corresponding topic:
 - [Embodied simulation upgrade](EMBODIED_SIMULATION_UPGRADE.md): six-axis
   control, multi-object missions, synthetic multi-view perception data,
   predictive simulation safety filtering, and recorded evidence.
+- [World-model Transformer](WORLD_MODEL.md): residual latent dynamics,
+  uncertainty-aware imagined rollouts, training evidence, and ROS 2 risk
+  preview integration.
 - [Experiment protocol](EXPERIMENT_PROTOCOL.md): required baselines, splits,
   metrics, artifact layout, and claims policy.
 - [Real2Sim2Real](REAL2SIM2REAL.md): real-log import, replay, system parameters,
@@ -33,6 +36,8 @@ Use these documents as the source of truth for the corresponding topic:
   artifact contracts, 4 GB GPU guidance, and reproduction diagnostics.
 - [Release process](RELEASE.md): strict release gates, claim audit, wheel
   verification, draft-release behavior, and maintainer checklist.
+- [Public repository scope](PUBLICATION.md): what belongs in a source commit,
+  what needs a release-asset review, and what must never be published.
 
 The repository may include smoke-run artifacts to prove that the pipeline
 executes. A smoke run is not a benchmark and is never evidence of real-robot

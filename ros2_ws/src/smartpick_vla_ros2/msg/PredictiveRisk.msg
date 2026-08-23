@@ -1,0 +1,13 @@
+std_msgs/Header header
+string task_id
+uint64 sequence_id
+string model_id
+float32 collision_probability
+float32 termination_probability
+float32 wrong_bin_probability
+float32 wrong_pick_probability
+float32 max_state_std
+uint32 horizon
+bool model_available
+bool blocked
+string[] risk_reasons

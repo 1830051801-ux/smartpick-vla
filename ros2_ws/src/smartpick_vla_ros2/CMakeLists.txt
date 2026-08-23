@@ -7,6 +7,7 @@ find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -14,7 +15,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ActionChunk.msg"
   "msg/RobotState.msg"
   "msg/ExecutionStatus.msg"
-  DEPENDENCIES builtin_interfaces geometry_msgs std_msgs
+  "msg/PredictiveRisk.msg"
+  DEPENDENCIES builtin_interfaces geometry_msgs sensor_msgs std_msgs
 )
 
 ament_python_install_package(${PROJECT_NAME})

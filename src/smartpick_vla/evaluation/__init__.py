@@ -19,6 +19,16 @@ from smartpick_vla.evaluation.benchmark import (
     evaluate_method,
     run_benchmark,
 )
+from smartpick_vla.evaluation.industrial import (
+    INDUSTRIAL_SCHEMA_VERSION,
+    IndustrialExperimentConfig,
+    IndustrialManifestEntry,
+    IndustrialRun,
+    IndustrialTask,
+    build_industrial_manifest,
+    run_industrial_experiment,
+    run_industrial_from_checkpoints,
+)
 from smartpick_vla.evaluation.media import save_episode_gif
 from smartpick_vla.evaluation.metrics import (
     EVALUATION_SCHEMA_VERSION,
@@ -45,6 +55,7 @@ __all__ = [
     "BENCHMARK_SUITES",
     "EPISODE_CSV_FIELDS",
     "EVALUATION_SCHEMA_VERSION",
+    "INDUSTRIAL_SCHEMA_VERSION",
     "AggregateMetrics",
     "BenchmarkConfig",
     "BenchmarkMedia",
@@ -53,6 +64,10 @@ __all__ = [
     "EpisodeAccumulator",
     "EpisodeResult",
     "EvaluationArtifacts",
+    "IndustrialExperimentConfig",
+    "IndustrialManifestEntry",
+    "IndustrialRun",
+    "IndustrialTask",
     "RateEstimate",
     "ResidualPolicyController",
     "VisionControllerConfig",
@@ -61,6 +76,7 @@ __all__ = [
     "VisionGuidedSixAxisController",
     "aggregate_episode_results",
     "build_evaluation_summary",
+    "build_industrial_manifest",
     "build_simulated_planar_calibration",
     "evaluate_method",
     "group_episode_results",
@@ -68,6 +84,8 @@ __all__ = [
     "plot_grouped_evaluation",
     "plot_learning_curves",
     "run_benchmark",
+    "run_industrial_experiment",
+    "run_industrial_from_checkpoints",
     "run_vision_guided_evaluation",
     "save_episode_gif",
     "save_episode_results",

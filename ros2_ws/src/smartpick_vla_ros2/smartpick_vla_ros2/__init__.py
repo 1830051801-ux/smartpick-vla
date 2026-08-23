@@ -5,11 +5,18 @@ pairing and timestamp helpers in :mod:`smartpick_vla_ros2.core` to be tested on
 development machines that do not have ROS 2 installed.
 """
 
-from .core import ChunkPair, ChunkPairBuffer, seconds_to_stamp_parts, stamp_to_seconds
+from .core import (
+    ChunkPair,
+    ChunkPairBuffer,
+    PredictiveRisk,
+    seconds_to_stamp_parts,
+    stamp_to_seconds,
+)
 
 __all__ = [
     "ChunkPair",
     "ChunkPairBuffer",
+    "PredictiveRisk",
     "seconds_to_stamp_parts",
     "stamp_to_seconds",
 ]

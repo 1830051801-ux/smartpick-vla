@@ -63,6 +63,22 @@ end-to-end scripts do not make it a production manipulation system.
 - Short smoke training is expected to be noisy and may show no ordering among
   methods.
 
+## World-model Transformer
+
+- The world model predicts latent/proprioceptive transitions and event heads;
+  it does not render future RGB or model unrestricted physical scenes.
+- Imagined rollouts hold the latest image and recursively feed predicted state,
+  so multi-step error can compound quickly.
+- The learned state standard deviation is an error diagnostic trained on the
+  archive. It is not a calibrated probability, collision certificate, or
+  replacement for deterministic workspace/joint/force limits.
+- The ROS 2 preview adapter lacks measured joint velocities and wrist-roll
+  feedback in the current message and fills them with zeros. It must remain
+  preview-only until the feedback contract is upgraded and validated.
+- The v2 smoke artifact contains 569 transition rows from two episodes. Its
+  RMSE, event accuracy, and 2-sigma coverage do not establish OOD, real-camera,
+  or real-robot generalization.
+
 ## Reproducibility
 
 - Fixed seeds improve traceability but do not guarantee bitwise-equivalent GPU

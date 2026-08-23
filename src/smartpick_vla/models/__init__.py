@@ -16,6 +16,11 @@ from smartpick_vla.models.vision_localizer import (
     VisionLocalizer,
     VisionLocalizerConfig,
 )
+from smartpick_vla.models.world_model import (
+    WorldModelConfig,
+    WorldModelPrediction,
+    WorldModelTransformer,
+)
 
 __all__ = [
     "BehaviorCloningConfig",
@@ -32,6 +37,9 @@ __all__ = [
     "VisionLocalizationPrediction",
     "VisionLocalizer",
     "VisionLocalizerConfig",
+    "WorldModelConfig",
+    "WorldModelPrediction",
+    "WorldModelTransformer",
     "compose_bounded_action",
     "count_parameters",
 ]
