@@ -113,10 +113,7 @@ class PerceptionLocalizationDataset(Dataset[dict[str, Tensor]]):
             valid_keypoints = np.isfinite(keypoints).all(axis=-1)
             visible &= valid_keypoints
             centers = np.asarray(
-                keypoints
-                / np.asarray(
-                    [max(1, width - 1), max(1, height - 1)], dtype=np.float32
-                ),
+                keypoints / np.asarray([max(1, width - 1), max(1, height - 1)], dtype=np.float32),
                 dtype=np.float32,
             )
             self.localization_label_source = "camera_projected_object_origin"
